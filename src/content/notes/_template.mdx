@@ -1,0 +1,60 @@
+---
+title: "Template — copy this file to start a note"
+summary: "Not published. Filenames starting with an underscore are skipped by the notes loader."
+date: "2026-01-01"
+tags: ["template"]
+draft: true
+---
+
+This file is a template. The leading underscore in `_template.mdx` keeps it out
+of the notes listing, the RSS feed and the sitemap, so it is safe to leave here.
+
+The quickest way to start a real note is:
+
+```bash
+npm run note -- "What I learned about JWT expiry"
+```
+
+That creates `src/content/notes/what-i-learned-about-jwt-expiry.mdx` with today's
+date already filled in, marked as a draft.
+
+## Frontmatter
+
+| Field     | Required | Notes                                                 |
+| --------- | -------- | ----------------------------------------------------- |
+| `title`   | yes      | Shown in the listing, the page heading and the OG image |
+| `date`    | yes      | `YYYY-MM-DD`. Sorting is newest first                  |
+| `summary` | no       | Used in the listing, meta description and RSS          |
+| `tags`    | no       | An array of short strings                              |
+| `draft`   | no       | `true` hides it from listings but the URL still works  |
+
+A note missing `title` or `date` is skipped with a warning rather than published
+half-formed.
+
+## What you can write
+
+Standard Markdown, plus GitHub extensions: tables, task lists and ~~strikethrough~~.
+
+- Bullet lists
+- With `inline code`
+- And [links](https://nextjs.org)
+
+Fenced code blocks are highlighted at build time, so no JavaScript is shipped to
+the browser for them:
+
+```ts
+type Note = {
+  slug: string;
+  title: string;
+};
+```
+
+> Blockquotes work too.
+
+Because this is MDX rather than plain Markdown, you can also import and use React
+components inside a note when you need something interactive.
+
+## Publishing
+
+Set `draft: false` and the note appears in the listing, the RSS feed and the
+sitemap on the next build.

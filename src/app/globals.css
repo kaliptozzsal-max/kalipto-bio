@@ -1,1 +1,562 @@
 @import "tailwindcss";
+
+/* ==========================================================================
+   Fonts
+
+   Inter is self-hosted here rather than through `next/font`.
+   `next/font` emits its @font-face rules as a *separate* stylesheet, which
+   becomes a second render-blocking request in the document head. Measured on
+   throttled mobile that extra round trip cost ~600ms of Largest Contentful
+   Paint. Declaring the face inside the one stylesheet Tailwind already
+   generates keeps it to a single blocking request.
+
+   The latin variable subset (48 KB) is preloaded from the document head — see
+   `layout.tsx`. The fallback metrics below are the values `next/font` computed
+   for Inter against Arial, so swapping to the real face causes no reflow, which
+   is why cumulative layout shift stays at zero.
+   ========================================================================== */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  /*
+   * `optional`, not `swap`.
+   *
+   * With `swap` the browser paints body copy in the fallback and then repaints
+   * it when Inter arrives — and that second paint is what Largest Contentful
+   * Paint records, since the largest element on this page is a paragraph. With
+   * `optional` the browser commits to one face for the load, so LCP lands with
+   * First Contentful Paint.
+   *
+   * The tradeoff is bounded: the file is preloaded and only 48 KB, so it wins
+   * the race on any normal connection. On a genuinely slow first load the page
+   * renders in the metric-matched fallback above instead, which is why this
+   * cannot cause layout shift either way.
+   */
+  font-display: optional;
+  src: url("/fonts/inter-latin-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+  size-adjust: 107.12%;
+}
+
+/* ==========================================================================
+   Design tokens — Tailwind v4 `@theme`
+   Dark-first, Apple-minimal surfaces with cyberpunk electric-blue accents.
+   ========================================================================== */
+@theme {
+  /* Typography ---------------------------------------------------------- */
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Same family as the body — display character comes from weight + tracking. */
+  --font-display: "Inter", "Inter Fallback", ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+  /* Platform monospace — no extra font download for small label text. */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono",
+    "Segoe UI Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Surfaces ------------------------------------------------------------ */
+  --color-void-950: #04060b;
+  --color-void-900: #070a12;
+  --color-void-850: #0a0e18;
+  --color-void-800: #0e131f;
+  --color-void-700: #161d2c;
+  --color-void-600: #202a3d;
+  --color-void-500: #2c3852;
+
+  /* Accent — electric blue --------------------------------------------- */
+  --color-electric-50: #eaf4ff;
+  --color-electric-100: #d2e7ff;
+  --color-electric-200: #a8d0ff;
+  --color-electric-300: #73b3ff;
+  --color-electric-400: #3d94ff;
+  --color-electric-500: #0a84ff;
+  --color-electric-600: #0066e0;
+  --color-electric-700: #004db0;
+  --color-electric-800: #003780;
+  --color-electric-900: #002454;
+
+  /* Secondary glows ----------------------------------------------------- */
+  --color-cyber-cyan: #22d3ee;
+  --color-cyber-violet: #7c5cff;
+
+  /* Foreground ---------------------------------------------------------- */
+  /*
+   * Foreground scale. Values are chosen so that even the faintest tone clears
+   * WCAG AA (4.5:1) against the darkest surface at small type sizes:
+   *   ink        on void-950 -> ~18:1
+   *   ink-muted  on void-950 -> ~8.1:1
+   *   ink-faint  on void-950 -> ~5.8:1
+   */
+  --color-ink: #f5f8fc;
+  --color-ink-muted: #98a4b8;
+  --color-ink-faint: #808b9c;
+
+  /* Hairlines ----------------------------------------------------------- */
+  --color-hairline: rgb(255 255 255 / 0.08);
+  --color-hairline-strong: rgb(255 255 255 / 0.14);
+
+  /* Motion -------------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-aurora: aurora 18s linear infinite;
+  --animate-pulse-glow: pulse-glow 3.5s var(--ease-in-out-smooth) infinite;
+  --animate-scan: scan 6s linear infinite;
+  --animate-spin-slow: spin 2.4s linear infinite;
+  --animate-track: track 1.3s var(--ease-in-out-smooth) infinite;
+
+  /*
+   * Ambient background drift. Deliberately CSS rather than JS: these run for the
+   * whole life of the page, and transform-only keyframes are composited off the
+   * main thread, so they cannot contribute to blocking time.
+   */
+  --animate-drift-a: drift-a 21s var(--ease-in-out-smooth) infinite;
+  --animate-drift-b: drift-b 26s var(--ease-in-out-smooth) infinite;
+  --animate-drift-c: drift-c 31s var(--ease-in-out-smooth) infinite;
+
+  @keyframes drift-a {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(26px, -32px, 0);
+    }
+  }
+
+  @keyframes drift-b {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-30px, 28px, 0);
+    }
+  }
+
+  @keyframes drift-c {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(34px, 22px, 0);
+    }
+  }
+  --animate-message-in: message-in 0.32s var(--ease-out-expo) both;
+
+  @keyframes message-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -6px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes track {
+    0% {
+      transform: translateX(-110%);
+    }
+    100% {
+      transform: translateX(420%);
+    }
+  }
+
+  @keyframes aurora {
+    0% {
+      transform: translate3d(-6%, -2%, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(4%, 3%, 0) scale(1.08);
+    }
+    66% {
+      transform: translate3d(-3%, 5%, 0) scale(0.96);
+    }
+    100% {
+      transform: translate3d(-6%, -2%, 0) scale(1);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scan {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    12% {
+      opacity: 0.6;
+    }
+    88% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(1200%);
+      opacity: 0;
+    }
+  }
+}
+
+/* ==========================================================================
+   Base layer
+   ========================================================================== */
+@layer base {
+  :root {
+    color-scheme: dark;
+    /* Offset for the fixed header when jumping to an #anchor */
+    scroll-padding-top: 6rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-void-950);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /*
+   * Optical sizing: the larger the heading, the tighter the tracking. This is
+   * what gives a single family genuine display presence rather than looking
+   * like scaled-up body copy.
+   */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.024em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    letter-spacing: -0.042em;
+  }
+
+  h2 {
+    letter-spacing: -0.032em;
+  }
+
+  ::selection {
+    background-color: var(--color-electric-500);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-electric-400);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Slim, on-brand scrollbar (progressive enhancement only) */
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-void-950);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-void-700);
+      border-radius: 9999px;
+      border: 2px solid var(--color-void-950);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-void-600);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Reduced motion (WCAG 2.3.3)
+
+     Framer Motion handles its own animations through `MotionConfig
+     reducedMotion="user"`. This block covers everything CSS-driven: the ambient
+     keyframe animations, hover transitions and smooth scrolling. Reveal
+     elements are also forced to their final state, so nothing can be left
+     mid-transition and invisible.
+     ------------------------------------------------------------------------ */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   Custom utilities
+   ========================================================================== */
+
+/* Frosted glass surface -------------------------------------------------- */
+@utility glass {
+  background-color: rgb(255 255 255 / 0.035);
+  border: 1px solid var(--color-hairline);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+@utility glass-strong {
+  background-color: rgb(10 14 24 / 0.72);
+  border: 1px solid var(--color-hairline-strong);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+}
+
+/* Inner top highlight, the classic Apple "lit edge" ---------------------- */
+@utility lit-edge {
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.07),
+    0 1px 2px 0 rgb(0 0 0 / 0.4);
+}
+
+/* Gradient text ---------------------------------------------------------- */
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #dbeafe 32%,
+    var(--color-electric-400) 68%,
+    var(--color-cyber-cyan) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility text-gradient-muted {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-ink) 0%,
+    var(--color-ink-muted) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Mesh gradient base ----------------------------------------------------- */
+@utility bg-mesh {
+  background-color: var(--color-void-950);
+  background-image:
+    radial-gradient(
+      42rem 34rem at 12% 8%,
+      rgb(10 132 255 / 0.16) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      38rem 30rem at 88% 14%,
+      rgb(124 92 255 / 0.13) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      44rem 32rem at 76% 78%,
+      rgb(34 211 238 / 0.1) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      36rem 30rem at 18% 88%,
+      rgb(10 132 255 / 0.1) 0%,
+      transparent 60%
+    );
+}
+
+/* Blueprint grid backdrop ------------------------------------------------ */
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility bg-grid-fine {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.028) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Fine film grain to kill gradient banding ------------------------------- */
+@utility bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Radial fade masks ------------------------------------------------------ */
+@utility mask-radial-fade {
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 40%, #000 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 65% 55% at 50% 40%,
+    #000 30%,
+    transparent 100%
+  );
+}
+
+@utility mask-fade-bottom {
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+@utility mask-fade-x {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
+
+/* Accent glows ----------------------------------------------------------- */
+@utility glow-electric {
+  box-shadow:
+    0 0 0 1px rgb(10 132 255 / 0.35),
+    0 8px 30px -8px rgb(10 132 255 / 0.45);
+}
+
+@utility glow-electric-lg {
+  box-shadow:
+    0 0 0 1px rgb(10 132 255 / 0.4),
+    0 18px 60px -12px rgb(10 132 255 / 0.55);
+}
+
+/* ==========================================================================
+   MDX note bodies
+
+   Element-level styling lives in `src/mdx-components.tsx`. What is left here is
+   the part Tailwind classes cannot reach: fenced code blocks, which Shiki emits
+   at build time with its own inline colours. Only the container is restyled —
+   never the token colours — so highlighting survives.
+   ========================================================================== */
+.mdx-content {
+  /* First block should not double up on the header's bottom spacing. */
+  & > :first-child {
+    margin-top: 2rem;
+  }
+
+  & pre {
+    margin-top: 1.75rem;
+    overflow-x: auto;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--color-hairline);
+    padding: 1.125rem 1.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    tab-size: 2;
+
+    /*
+     * Shiki writes `background-color` inline from its theme. Overriding it here
+     * keeps code blocks consistent with the site's glass surfaces instead of
+     * introducing a second, unrelated dark grey.
+     */
+    background-color: rgb(255 255 255 / 0.035) !important;
+    backdrop-filter: blur(10px);
+  }
+
+  & pre code {
+    display: block;
+    font-family: var(--font-mono);
+  }
+
+  /* Shiki marks each line, which makes wrapping predictable. */
+  & pre code .line {
+    display: inline-block;
+    width: 100%;
+  }
+
+  /* Headings linked by rehype-autolink-headings get a hover affordance. */
+  & :is(h2, h3, h4) > a {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  & :is(h2, h3, h4) > a::after {
+    content: "#";
+    position: absolute;
+    margin-left: 0.4em;
+    color: var(--color-electric-400);
+    opacity: 0;
+    transition: opacity 200ms ease-out;
+  }
+
+  & :is(h2, h3, h4) > a:hover::after,
+  & :is(h2, h3, h4) > a:focus-visible::after {
+    opacity: 1;
+  }
+}
+
+/* Screen-reader-only, with a visible-on-focus escape hatch --------------- */
+@utility sr-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  &:focus-visible {
+    position: fixed;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+}

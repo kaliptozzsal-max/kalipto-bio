@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // `kaliptotop/` is a separate application that happens to live inside this
+    // directory. It ships its own eslint and TypeScript configs, so linting it
+    // from here only produces noise about code this project does not own.
+    "kaliptotop/**",
   ]),
 ]);
 
