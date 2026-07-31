@@ -34,12 +34,20 @@ export const siteConfig = {
   // `lib/github.ts` stay meaningful once you fill it in.
   githubUsername: "" as string,
   /**
-   * Canonical origin. Set NEXT_PUBLIC_SITE_URL in your Vercel project settings;
-   * the fallback only keeps local builds and previews working.
+   * Canonical origin — the exact host that serves the site.
+   *
+   * `www` is included deliberately: the apex `kaliptosal.dev` issues a 308
+   * redirect to `www.kaliptosal.dev`, so the apex is not where pages actually
+   * live. Every canonical tag, Open Graph URL, sitemap entry and RSS link is
+   * built from this value, and pointing them at a redirect wastes crawl budget
+   * and splits signals between two hosts.
+   *
+   * The default is correct for production, so no environment variable is needed.
+   * NEXT_PUBLIC_SITE_URL can still override it for preview deployments.
    */
   url:
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-    "https://kalipto.dev",
+    "https://www.kaliptosal.dev",
   keywords: [
     "Kalipto",
     "cybersecurity",
