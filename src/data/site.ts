@@ -32,7 +32,7 @@ export const siteConfig = {
    */
   // Typed as `string` rather than the empty literal so the checks in
   // `lib/github.ts` stay meaningful once you fill it in.
-  githubUsername: "" as string,
+  githubUsername: "kaliptozzsal-max" as string,
   /**
    * Canonical origin — the exact host that serves the site.
    *
@@ -55,6 +55,7 @@ export const siteConfig = {
     "automation engineer",
     "clinical engineering",
     "biomedical engineering",
+    "open source",
     "Next.js",
     "TypeScript",
     "Python",
@@ -112,8 +113,15 @@ export const contactChannels: readonly ContactChannel[] = [
     handle: siteConfig.phoneDisplay,
   },
   // To add another platform, append its real URL, e.g.
-  // { label: "GitHub", icon: "github", href: "https://github.com/<handle>",
+  // { label: "LinkedIn", icon: "linkedin", href: "https://linkedin.com/in/<handle>",
   //   handle: "@<handle>", external: true },
+  {
+    label: "GitHub",
+    icon: "github",
+    href: "https://github.com/kaliptozzsal-max",
+    handle: "@kaliptozzsal-max",
+    external: true,
+  },
 ] as const;
 
 /** Channels suitable for schema.org `sameAs` — public profiles, not private contact methods. */

@@ -17,16 +17,19 @@ type GitHubRepoResponse = {
   full_name: string;
   description: string | null;
   html_url: string;
+  clone_url: string;
   homepage: string | null;
   language: string | null;
   stargazers_count: number;
   forks_count: number;
   topics?: string[];
+  license: { key: string; name: string; spdx_id: string } | null;
   fork: boolean;
   archived: boolean;
   private: boolean;
   pushed_at: string;
   updated_at: string;
+  created_at: string;
 };
 
 export type Repo = {
@@ -100,15 +103,7 @@ export async function fetchRepos(): Promise<Repo[]> {
   const username = siteConfig.githubUsername;
   if (!username) return [];
 
-  const token = process.env.GITHUB_TOKEN;
-
-  const headers: HeadersInit = {
-    Accept: "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-    // GitHub asks for a User-Agent identifying the caller.
-    "User-Agent": `${siteConfig.name}-portfolio`,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
+  const headers = githubHeaders();
 
   try {
     const response = await fetch(
@@ -179,4 +174,269 @@ export function relativeTime(iso: string): string {
 
   const years = Math.floor(months / 12);
   return `${years} year${years === 1 ? "" : "s"} ago`;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Open Source Hub — extended types and fetchers
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Categories inferred from repository topics, language, and name.
+ * A repo can only belong to one category — the first match wins.
+ */
+export const REPO_CATEGORIES = [
+  "All",
+  "Security",
+  "AI & ML",
+  "Automation",
+  "Web",
+  "CLI & Tools",
+  "Other",
+] as const;
+
+export type RepoCategory = (typeof REPO_CATEGORIES)[number];
+
+/** Sort options available in the hub UI. */
+export type RepoSort = "stars" | "updated" | "name" | "created";
+
+/** Extended repo shape used by the /open-source hub. */
+export type FullRepo = {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string | null;
+  url: string;
+  cloneUrl: string;
+  demoUrl: string | null;
+  language: string | null;
+  stars: number;
+  forks: number;
+  topics: readonly string[];
+  license: string | null;
+  licenseSpdx: string | null;
+  archived: boolean;
+  pushedAt: string;
+  createdAt: string;
+  category: RepoCategory;
+  /** True if the repo is starred or pinned (top 3 by stars). */
+  featured: boolean;
+};
+
+// ── Category inference ──────────────────────────────────────────────────────
+
+const SECURITY_SIGNALS = [
+  "security", "cybersecurity", "pentest", "ctf", "exploit", "vulnerability",
+  "malware", "forensics", "reverse-engineering", "osint", "infosec", "crypto",
+  "encryption", "firewall", "ids", "siem", "threat", "zero-day", "burp",
+  "nmap", "metasploit", "wireshark",
+];
+
+const AI_SIGNALS = [
+  "ai", "ml", "machine-learning", "deep-learning", "neural", "llm", "gpt",
+  "transformer", "nlp", "computer-vision", "tensorflow", "pytorch", "keras",
+  "huggingface", "langchain", "openai", "chatbot", "model",
+];
+
+const AUTOMATION_SIGNALS = [
+  "automation", "bot", "scraper", "crawler", "pipeline", "ci", "cd", "devops",
+  "ansible", "terraform", "docker", "kubernetes", "workflow", "cron", "scheduler",
+];
+
+const WEB_SIGNALS = [
+  "web", "nextjs", "react", "vue", "angular", "svelte", "frontend", "backend",
+  "fullstack", "api", "rest", "graphql", "html", "css", "tailwind", "node",
+  "express", "django", "flask", "fastapi", "portfolio", "website",
+];
+
+const CLI_SIGNALS = [
+  "cli", "tool", "utility", "terminal", "shell", "bash", "script", "command",
+  "generator", "converter", "formatter", "linter",
+];
+
+/**
+ * Infers a category from repo metadata. Matches against topics first (most
+ * intentional), then repo name, then description. First match wins.
+ */
+function inferCategory(repo: GitHubRepoResponse): RepoCategory {
+  const signals = [
+    ...(repo.topics ?? []).map((t) => t.toLowerCase()),
+    repo.name.toLowerCase().replace(/[-_]/g, " ").split(" "),
+    (repo.description ?? "").toLowerCase().split(/\W+/),
+  ].flat();
+
+  const matches = (keywords: string[]) =>
+    keywords.some((keyword) => signals.includes(keyword));
+
+  if (matches(SECURITY_SIGNALS)) return "Security";
+  if (matches(AI_SIGNALS)) return "AI & ML";
+  if (matches(AUTOMATION_SIGNALS)) return "Automation";
+  if (matches(WEB_SIGNALS)) return "Web";
+  if (matches(CLI_SIGNALS)) return "CLI & Tools";
+
+  // Language-based fallback
+  const lang = repo.language?.toLowerCase() ?? "";
+  if (["typescript", "javascript", "html", "css"].includes(lang)) return "Web";
+  if (["python"].includes(lang) && matches(["data", "notebook", "jupyter"])) return "AI & ML";
+
+  return "Other";
+}
+
+// ── Shared request headers ──────────────────────────────────────────────────
+
+function githubHeaders(): HeadersInit {
+  const token = process.env.GITHUB_TOKEN;
+  return {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": `${siteConfig.name}-portfolio`,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+// ── Paginated fetch ─────────────────────────────────────────────────────────
+
+/**
+ * Fetches ALL public, non-fork repositories for the configured user.
+ *
+ * Unlike `fetchRepos()` which returns the top 6 for the homepage section, this
+ * returns everything (including archived repos) for the full open-source hub.
+ * Paginated to handle accounts with 100+ repos.
+ *
+ * Returns an empty array on any failure — never throws.
+ */
+export async function fetchAllRepos(): Promise<FullRepo[]> {
+  const username = siteConfig.githubUsername;
+  if (!username) return [];
+
+  const headers = githubHeaders();
+  const allRaw: GitHubRepoResponse[] = [];
+
+  try {
+    let page = 1;
+    const perPage = 100;
+
+    // GitHub caps at 100 per page; iterate until we get fewer than perPage.
+    while (page <= 10) {
+      const response = await fetch(
+        `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=${perPage}&page=${page}&sort=pushed&type=owner`,
+        {
+          headers,
+          next: { revalidate: REVALIDATE_SECONDS },
+        },
+      );
+
+      if (!response.ok) {
+        console.warn(
+          `[github] ${response.status} ${response.statusText} fetching page ${page} for "${username}".`,
+        );
+        break;
+      }
+
+      const data = (await response.json()) as unknown;
+      if (!Array.isArray(data) || data.length === 0) break;
+
+      allRaw.push(...(data as GitHubRepoResponse[]));
+
+      if (data.length < perPage) break;
+      page += 1;
+    }
+  } catch (error) {
+    console.warn("[github] fetchAllRepos failed.", error);
+    return [];
+  }
+
+  // Filter out forks but KEEP archived repos (shown with a badge).
+  const filtered = allRaw.filter((repo) => !repo.fork && !repo.private);
+
+  // Determine "featured" — top 3 by stars among non-archived repos.
+  const starSorted = [...filtered]
+    .filter((r) => !r.archived)
+    .sort((a, b) => b.stargazers_count - a.stargazers_count);
+  const featuredIds = new Set(starSorted.slice(0, 3).map((r) => r.id));
+
+  return filtered.map(
+    (repo): FullRepo => ({
+      id: repo.id,
+      name: repo.name,
+      fullName: repo.full_name,
+      description: repo.description,
+      url: repo.html_url,
+      cloneUrl: repo.clone_url,
+      demoUrl: repo.homepage?.trim() || null,
+      language: repo.language,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      topics: repo.topics ?? [],
+      license: repo.license?.name ?? null,
+      licenseSpdx: repo.license?.spdx_id ?? null,
+      archived: repo.archived,
+      pushedAt: repo.pushed_at,
+      createdAt: repo.created_at,
+      category: inferCategory(repo),
+      featured: featuredIds.has(repo.id),
+    }),
+  );
+}
+
+// ── Sorting ─────────────────────────────────────────────────────────────────
+
+/** Sort a repo list in place (or a copy). Returns a new sorted array. */
+export function sortRepos(repos: readonly FullRepo[], sort: RepoSort): FullRepo[] {
+  const copy = [...repos];
+
+  switch (sort) {
+    case "stars":
+      return copy.sort((a, b) => b.stars - a.stars || Date.parse(b.pushedAt) - Date.parse(a.pushedAt));
+    case "updated":
+      return copy.sort((a, b) => Date.parse(b.pushedAt) - Date.parse(a.pushedAt));
+    case "name":
+      return copy.sort((a, b) => a.name.localeCompare(b.name));
+    case "created":
+      return copy.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+    default:
+      return copy;
+  }
+}
+
+// ── Filtering ───────────────────────────────────────────────────────────────
+
+/** Filter repos by category, search term, and archived status. */
+export function filterRepos(
+  repos: readonly FullRepo[],
+  options: {
+    category?: RepoCategory;
+    search?: string;
+    includeArchived?: boolean;
+  },
+): FullRepo[] {
+  let result = [...repos];
+
+  // Category filter — "All" shows everything.
+  if (options.category && options.category !== "All") {
+    result = result.filter((r) => r.category === options.category);
+  }
+
+  // Archived filter — hidden by default.
+  if (!options.includeArchived) {
+    result = result.filter((r) => !r.archived);
+  }
+
+  // Text search — name, description, topics, language.
+  if (options.search?.trim()) {
+    const q = options.search.trim().toLowerCase();
+    result = result.filter((r) => {
+      const haystack = [
+        r.name,
+        r.description ?? "",
+        r.language ?? "",
+        ...r.topics,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
+  return result;
 }

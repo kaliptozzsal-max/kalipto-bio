@@ -37,6 +37,10 @@ export function getNavLinks(): NavLink[] {
     links.push({ label: "Notes", href: "/notes", kind: "route" });
   }
 
+  if (isGitHubConfigured()) {
+    links.push({ label: "Open Source", href: "/open-source", kind: "route" });
+  }
+
   links.push({ label: "Contact", href: "#contact", kind: "anchor" });
 
   return links;

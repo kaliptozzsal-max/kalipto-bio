@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/data/site";
+import { isGitHubConfigured } from "@/lib/github";
 import { getNotes } from "@/lib/notes";
 
 /**
@@ -20,6 +21,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
   ];
+
+  if (isGitHubConfigured()) {
+    entries.push({
+      url: `${siteConfig.url}/open-source`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    });
+  }
 
   if (notes.length > 0) {
     entries.push({
