@@ -22,7 +22,13 @@ export function Container({
 }: ContainerProps) {
   return (
     <Tag
-      className={cn("mx-auto w-full px-5 sm:px-8", sizes[size], className)}
+      className={cn(
+        // 16px gutter below 400px so narrow phones get back 8px of content
+        // width, stepping up to the unchanged 32px from `sm` upward.
+        "mx-auto w-full px-4 min-[400px]:px-5 sm:px-8",
+        sizes[size],
+        className,
+      )}
     >
       {children}
     </Tag>
