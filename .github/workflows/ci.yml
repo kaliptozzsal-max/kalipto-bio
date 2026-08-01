@@ -1,0 +1,55 @@
+name: CI
+
+# Gate every change to main, and every pull request targeting it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows a manual re-run from the Actions tab without an empty commit.
+  workflow_dispatch:
+
+# A newer push to the same ref makes an in-flight run obsolete — cancel it
+# rather than paying for both.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# This workflow only reads the repository.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, typecheck and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Matches the `engines.node` floor in package.json.
+          node-version: 22
+          # Caches ~/.npm keyed on package-lock.json.
+          cache: npm
+
+      # `npm ci` rather than `npm install`: it installs exactly what the
+      # lockfile specifies and fails if the two have drifted apart.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # No secrets are set here on purpose. Every integration (GitHub repos,
+      # Telegram, email) is written to degrade when unconfigured, so a green
+      # build proves a fresh clone builds for anyone.
+      - name: Build
+        run: npm run build
