@@ -246,6 +246,41 @@
   }
 
   /*
+   * Remove the grey flash Android paints over tapped elements. Every
+   * interactive element here has its own active state, so the default overlay
+   * only ever looks like a rendering glitch.
+   */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /*
+   * Touch devices have no hover, but CSS `:hover` still latches after a tap and
+   * stays applied until the next interaction — so a tapped card would sit
+   * lifted and glowing. Neutralising the transform on coarse pointers keeps
+   * `:active` as the only feedback, which is what a touch user expects.
+   *
+   * Scoped to `hover: none` so a laptop with a touchscreen keeps real hover.
+   */
+  @media (hover: none) {
+    .group:hover,
+    a:hover,
+    button:hover {
+      transform: none;
+    }
+  }
+
+  /* Inputs must never be smaller than 16px or iOS Safari zooms the page on
+     focus, which then leaves the layout shifted sideways. */
+  @media (max-width: 640px) {
+    input,
+    textarea,
+    select {
+      font-size: 1rem;
+    }
+  }
+
+  /*
    * Optical sizing: the larger the heading, the tighter the tracking. This is
    * what gives a single family genuine display presence rather than looking
    * like scaled-up body copy.
@@ -380,6 +415,39 @@
   -webkit-background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   Mobile background cost
+
+   The backdrop stacks several very large blur radii. On desktop that is free;
+   on a phone GPU each one is a full-screen offscreen buffer, and together they
+   dominate the frame budget while scrolling.
+
+   Below `sm` the radii are cut roughly in half and the ambient drift is stopped
+   entirely. The visual difference at that size is negligible — the shapes are
+   already soft washes — but the compositing work drops sharply.
+   ========================================================================== */
+@media (max-width: 639px) {
+  .blur-\[110px\] {
+    --tw-blur: blur(56px);
+    filter: blur(56px);
+  }
+  .blur-\[130px\] {
+    --tw-blur: blur(64px);
+    filter: blur(64px);
+  }
+  .blur-\[150px\] {
+    --tw-blur: blur(72px);
+    filter: blur(72px);
+  }
+
+  /* Ambient drift is decorative and never in the user's focus on a phone. */
+  .animate-drift-a,
+  .animate-drift-b,
+  .animate-drift-c {
+    animation: none;
+  }
 }
 
 /* Mesh gradient base ----------------------------------------------------- */
@@ -550,8 +618,14 @@
   clip-path: inset(50%);
   white-space: nowrap;
 
+  /* Once revealed by keyboard focus it becomes a normal control, so it has to
+     meet the same 44px minimum as everything else. */
   &:focus-visible {
     position: fixed;
+    display: inline-flex;
+    align-items: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
     width: auto;
     height: auto;
     margin: 0;
