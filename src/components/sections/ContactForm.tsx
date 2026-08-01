@@ -23,6 +23,18 @@ import { cn } from "@/lib/utils";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+/**
+ * Field definitions including the mobile keyboard hints.
+ *
+ * These attributes are what separate a usable phone form from a frustrating
+ * one:
+ *   inputMode      picks the on-screen keyboard layout (`email` adds @ and .)
+ *   enterKeyHint   labels the action key — "next" through the fields, "send"
+ *                  on the last one, so the keyboard itself shows progress
+ *   autoCapitalize off for email, so iOS does not capitalise the address
+ *   autoCorrect /  off for email and name, which autocorrect mangles
+ *   spellCheck
+ */
 const fields = [
   {
     name: "name",
@@ -30,6 +42,11 @@ const fields = [
     type: "text",
     placeholder: "Your name",
     autoComplete: "name",
+    inputMode: "text",
+    enterKeyHint: "next",
+    autoCapitalize: "words",
+    autoCorrect: "off",
+    spellCheck: false,
   },
   {
     name: "email",
@@ -37,6 +54,11 @@ const fields = [
     type: "email",
     placeholder: "you@example.com",
     autoComplete: "email",
+    inputMode: "email",
+    enterKeyHint: "next",
+    autoCapitalize: "none",
+    autoCorrect: "off",
+    spellCheck: false,
   },
   {
     name: "subject",
@@ -44,13 +66,23 @@ const fields = [
     type: "text",
     placeholder: "What is this about?",
     autoComplete: "off",
+    inputMode: "text",
+    enterKeyHint: "next",
+    autoCapitalize: "sentences",
+    autoCorrect: "on",
+    spellCheck: true,
   },
 ] as const;
 
+/*
+ * `min-h-12` gives every input a 48px touch target. The base font size is left
+ * to the 16px rule in globals.css — anything smaller makes iOS Safari zoom the
+ * page on focus, which then leaves the layout shifted sideways.
+ */
 const inputBase =
-  "w-full rounded-2xl border bg-void-900/60 px-4 py-3 text-[0.9375rem] text-ink " +
+  "w-full min-h-12 rounded-2xl border bg-void-900/60 px-4 py-3 text-base text-ink " +
   "placeholder:text-ink-faint transition-[border-color,box-shadow] duration-300 " +
-  "focus:outline-none focus-visible:outline-none";
+  "focus:outline-none focus-visible:outline-none sm:text-[0.9375rem]";
 
 const inputOk =
   "border-hairline focus-visible:border-electric-400/70 focus-visible:ring-2 focus-visible:ring-electric-500/25";
@@ -233,6 +265,11 @@ export function ContactForm() {
                 type={field.type}
                 required
                 autoComplete={field.autoComplete}
+                inputMode={field.inputMode}
+                enterKeyHint={field.enterKeyHint}
+                autoCapitalize={field.autoCapitalize}
+                autoCorrect={field.autoCorrect}
+                spellCheck={field.spellCheck}
                 placeholder={field.placeholder}
                 value={values[field.name]}
                 onChange={update(field.name)}
@@ -280,6 +317,9 @@ export function ContactForm() {
           value={values.message}
           onChange={update("message")}
           onBlur={validateOnBlur("message")}
+          enterKeyHint="send"
+          autoCapitalize="sentences"
+          spellCheck
           aria-invalid={errors.message ? "true" : undefined}
           aria-describedby={
             errors.message ? `${formId}-message-error` : `${formId}-message-hint`
