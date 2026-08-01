@@ -31,6 +31,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
+  // Developer Tools
+  const toolSlugs = ["json", "jwt", "base64", "uuid", "hash", "regex", "timestamp", "url", "markdown"];
+  entries.push({
+    url: `${siteConfig.url}/tools`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  });
+  for (const slug of toolSlugs) {
+    entries.push({
+      url: `${siteConfig.url}/tools/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    });
+  }
+
   if (notes.length > 0) {
     entries.push({
       url: `${siteConfig.url}/notes`,

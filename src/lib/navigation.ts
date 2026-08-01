@@ -41,6 +41,8 @@ export function getNavLinks(): NavLink[] {
     links.push({ label: "Open Source", href: "/open-source", kind: "route" });
   }
 
+  links.push({ label: "Tools", href: "/tools", kind: "route" });
+
   links.push({ label: "Contact", href: "#contact", kind: "anchor" });
 
   return links;
