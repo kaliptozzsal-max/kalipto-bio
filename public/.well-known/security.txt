@@ -1,0 +1,11 @@
+# Security contact information for www.kaliptosal.dev
+# Format: RFC 9116 — https://www.rfc-editor.org/rfc/rfc9116
+
+Contact: mailto:kaliptozzsal@gmail.com
+Contact: https://t.me/kaliptoz
+
+Expires: 2027-07-31T00:00:00.000Z
+
+Preferred-Languages: en, km
+
+Canonical: https://www.kaliptosal.dev/.well-known/security.txt
