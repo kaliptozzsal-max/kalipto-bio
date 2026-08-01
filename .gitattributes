@@ -1,0 +1,53 @@
+# Normalise line endings.
+#
+# Without this, `core.autocrlf` decides per machine, which is why `git add` was
+# warning "LF will be replaced by CRLF" on every file. Text is stored as LF in
+# the repository and checked out as LF everywhere, so Windows and Linux
+# contributors — and CI — all see identical bytes.
+* text=auto eol=lf
+
+# Files that must keep CRLF to work on Windows.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Shell scripts must stay LF or they fail to execute.
+*.sh text eol=lf
+
+# ---------------------------------------------------------------------------
+# Binary assets — never diffed, never line-ending converted.
+# ---------------------------------------------------------------------------
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.avif binary
+*.ico  binary
+*.pdf  binary
+
+*.mp4 binary
+*.webm binary
+
+*.zip binary
+*.gz  binary
+*.db  binary
+*.sqlite binary
+
+# SVGs are text and benefit from real diffs.
+*.svg text
+
+# ---------------------------------------------------------------------------
+# Review and language-statistics hints
+# ---------------------------------------------------------------------------
+# Collapse the lockfile in pull requests and exclude it from language stats.
+package-lock.json -diff linguist-generated=true
+
+# Keep GitHub's language bar reflecting source, not content or config.
+*.mdx linguist-documentation=true
