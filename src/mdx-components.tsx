@@ -2,6 +2,11 @@ import type { MDXComponents } from "mdx/types";
 import Image, { type ImageProps } from "next/image";
 import Link from "next/link";
 import type { ComponentPropsWithoutRef } from "react";
+import { Accordion } from "@/components/mdx/Accordion";
+import { Callout } from "@/components/mdx/Callout";
+import { CodeGroup } from "@/components/mdx/CodeGroup";
+import { Tab, Tabs } from "@/components/mdx/Tabs";
+import { YouTube } from "@/components/mdx/YouTube";
 
 /**
  * Global MDX element mapping.
@@ -179,5 +184,14 @@ const components: MDXComponents = {
 };
 
 export function useMDXComponents(): MDXComponents {
-  return components;
+  return {
+    ...components,
+    // Custom MDX components available in every note
+    Callout,
+    Accordion,
+    Tabs,
+    Tab,
+    CodeGroup,
+    YouTube,
+  };
 }

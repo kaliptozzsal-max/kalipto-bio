@@ -634,3 +634,86 @@
     white-space: normal;
   }
 }
+
+/* ==========================================================================
+   Print mode
+   ========================================================================== */
+@media print {
+  /* Remove decorative backgrounds and overlays */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Hide chrome: nav, footer, background effects, progress bars */
+  header,
+  footer,
+  [data-reveal],
+  [aria-hidden="true"]:not(span) {
+    display: none !important;
+  }
+
+  /* Reset the site background */
+  .bg-mesh,
+  .bg-grid,
+  .bg-noise,
+  .mask-radial-fade {
+    display: none !important;
+  }
+
+  /* Article gets full width, no padding for nav */
+  article {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Override glass cards and borders for clean printing */
+  .glass,
+  .glass-strong,
+  .lit-edge {
+    background: transparent !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Make all text black for readability */
+  .text-ink,
+  .text-ink-muted,
+  .text-ink-faint,
+  .text-electric-200,
+  .text-electric-300,
+  .text-gradient {
+    color: black !important;
+    -webkit-text-fill-color: black !important;
+    background: none !important;
+  }
+
+  /* Code blocks: light background, dark text */
+  .mdx-content pre {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    color: #1a1a1a !important;
+    backdrop-filter: none !important;
+  }
+
+  .mdx-content pre code .line {
+    color: #1a1a1a !important;
+  }
+
+  /* Links show their URL */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  /* Page breaks */
+  h2, h3 {
+    break-after: avoid;
+  }
+
+  pre, blockquote, img {
+    break-inside: avoid;
+  }
+}

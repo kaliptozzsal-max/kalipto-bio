@@ -23,6 +23,8 @@ export type Note = {
   /** ISO date string, e.g. "2026-07-31". */
   date: string;
   tags: readonly string[];
+  /** Optional category for grouping. */
+  category: string;
   /** Rounded minutes, from the word count of the body. */
   readingMinutes: number;
   /** Hidden from listings, RSS and the sitemap, but still reachable by URL. */
@@ -34,6 +36,7 @@ type Frontmatter = {
   summary?: unknown;
   date?: unknown;
   tags?: unknown;
+  category?: unknown;
   draft?: unknown;
 };
 
@@ -93,6 +96,7 @@ function parseNote(filename: string): Note | null {
     summary: asString(frontmatter.summary),
     date,
     tags: asTags(frontmatter.tags),
+    category: asString(frontmatter.category),
     readingMinutes: readingMinutesOf(content),
     draft: frontmatter.draft === true,
   };
@@ -144,4 +148,140 @@ export function formatNoteDate(iso: string): string {
     year: "numeric",
     timeZone: "UTC",
   });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Knowledge Base extensions
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** All unique categories across published notes. */
+export function getNoteCategories(): string[] {
+  const cats = new Set<string>();
+  for (const note of getNotes()) {
+    if (note.category) cats.add(note.category);
+  }
+  return [...cats].sort();
+}
+
+/** All unique tags across published notes, sorted alphabetically. */
+export function getAllTags(): string[] {
+  const tags = new Set<string>();
+  for (const note of getNotes()) {
+    for (const tag of note.tags) tags.add(tag);
+  }
+  return [...tags].sort();
+}
+
+/** Previous and next notes relative to the given slug (chronological order). */
+export function getPrevNextNotes(slug: string): { prev: Note | null; next: Note | null } {
+  const notes = getNotes();
+  const index = notes.findIndex((n) => n.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+
+  return {
+    // "next" is newer (lower index), "prev" is older (higher index)
+    next: index > 0 ? notes[index - 1] : null,
+    prev: index < notes.length - 1 ? notes[index + 1] : null,
+  };
+}
+
+/**
+ * Related notes: same category first, then shared tags, excluding the current note.
+ * Returns at most `limit` results.
+ */
+export function getRelatedNotes(slug: string, limit = 3): Note[] {
+  const current = getNote(slug);
+  if (!current) return [];
+
+  const notes = getNotes().filter((n) => n.slug !== slug);
+
+  // Score each note by relevance to the current one
+  const scored = notes.map((note) => {
+    let score = 0;
+    if (current.category && note.category === current.category) score += 3;
+    for (const tag of note.tags) {
+      if (current.tags.includes(tag)) score += 1;
+    }
+    return { note, score };
+  });
+
+  return scored
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score || Date.parse(b.note.date) - Date.parse(a.note.date))
+    .slice(0, limit)
+    .map((s) => s.note);
+}
+
+/**
+ * Lightweight search index for client-side full-text search.
+ * Returns a JSON-serializable array of {slug, title, summary, tags, category, date}.
+ */
+export type NoteSearchEntry = {
+  slug: string;
+  title: string;
+  summary: string;
+  tags: readonly string[];
+  category: string;
+  date: string;
+  readingMinutes: number;
+};
+
+export function getSearchIndex(): NoteSearchEntry[] {
+  return getNotes().map((note) => ({
+    slug: note.slug,
+    title: note.title,
+    summary: note.summary,
+    tags: note.tags,
+    category: note.category,
+    date: note.date,
+    readingMinutes: note.readingMinutes,
+  }));
+}
+
+/**
+ * Extract table of contents from MDX content.
+ * Parses heading lines (## and ###) from the raw markdown body.
+ */
+export type TocEntry = {
+  id: string;
+  text: string;
+  level: 2 | 3;
+};
+
+export function extractToc(slug: string): TocEntry[] {
+  const filePath = path.join(NOTES_DIR, `${slug}.mdx`);
+
+  let raw: string;
+  try {
+    raw = fs.readFileSync(filePath, "utf8");
+  } catch {
+    return [];
+  }
+
+  const { content } = matter(raw);
+  const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+  const entries: TocEntry[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = headingRegex.exec(content)) !== null) {
+    const level = match[1].length as 2 | 3;
+    const text = match[2]
+      .replace(/\*\*(.+?)\*\*/g, "$1")  // strip bold
+      .replace(/\*(.+?)\*/g, "$1")      // strip italic
+      .replace(/`(.+?)`/g, "$1")        // strip inline code
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // strip links
+      .trim();
+
+    // Generate id matching rehype-slug's algorithm
+    const id = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    entries.push({ id, text, level });
+  }
+
+  return entries;
 }
