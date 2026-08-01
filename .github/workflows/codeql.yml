@@ -1,0 +1,49 @@
+name: CodeQL
+
+# Static analysis for security vulnerabilities. Results appear under
+# Security → Code scanning alerts. Free for public repositories.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, Monday 04:17 UTC. An off-peak, non-round time reduces the chance
+    # of being queued behind the flood of jobs scheduled on the hour.
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze JavaScript/TypeScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      # Required to upload results to the code-scanning API.
+      security-events: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          # security-and-quality adds maintainability rules on top of the
+          # default security queries.
+          queries: security-and-quality
+
+      # No build step is configured: JavaScript and TypeScript are analysed
+      # directly from source, so compiling would only add time.
+      - name: Analyse
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
