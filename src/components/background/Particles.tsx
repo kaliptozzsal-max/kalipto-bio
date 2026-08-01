@@ -31,6 +31,17 @@ export function Particles({ density = 46 }: { density?: number }) {
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
+    /*
+     * On phones the canvas is skipped entirely rather than merely thinned.
+     *
+     * It is pure texture at this size — a handful of 1px dots behind a mesh
+     * gradient, several blur layers and a noise overlay — so nobody can tell it
+     * is gone, while a per-frame redraw plus a full-screen composite is real
+     * work on a mobile GPU during scroll.
+     */
+    const smallScreen = window.matchMedia("(max-width: 639px)").matches;
+    if (smallScreen) return;
+
     let particles: Particle[] = [];
     let width = 0;
     let height = 0;
