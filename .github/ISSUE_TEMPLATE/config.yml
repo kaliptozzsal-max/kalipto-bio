@@ -1,0 +1,12 @@
+# Keeps the "New issue" chooser to the two templates above, so security
+# reports and general questions are routed to the right place instead.
+blank_issues_enabled: false
+
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/kaliptozzsal-max/kalipto-bio/security/advisories/new
+    about: Report privately. Please do not open a public issue for anything exploitable.
+
+  - name: Ask a question or say hello
+    url: https://t.me/kaliptoz
+    about: Telegram is the quickest way to reach me.

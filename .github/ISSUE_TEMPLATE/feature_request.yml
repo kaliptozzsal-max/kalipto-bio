@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest an addition or improvement
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: >
+        Start with the problem rather than the solution — it usually leads
+        somewhere better.
+      placeholder: There is no way to find a note without scrolling the whole list.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you have in mind?
+      placeholder: Client-side search over note titles, summaries and tags.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      placeholder: Tag archive pages would help, but not for arbitrary text.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which area does this touch?
+      options:
+        - Site content or copy
+        - UI, design or animation
+        - Notes / MDX
+        - GitHub projects section
+        - Contact form
+        - Performance
+        - Accessibility
+        - Build, CI or tooling
+        - Something else
+    validations:
+      required: true

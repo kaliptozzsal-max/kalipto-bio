@@ -1,0 +1,71 @@
+name: Bug report
+description: Something on the site is broken or behaves unexpectedly
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Found a security vulnerability?** Please do not file it here — follow
+        [SECURITY.md](https://github.com/kaliptozzsal-max/kalipto-bio/blob/main/SECURITY.md)
+        so it stays private until it is fixed.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+      placeholder: The contact form showed a success message but no message arrived.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to /notes
+        2. Click the first note
+        3. Scroll to the bottom
+        4. See the error
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      placeholder: https://www.kaliptosal.dev/notes
+    validations:
+      required: false
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did you see it?
+      options:
+        - The live site (www.kaliptosal.dev)
+        - Running it locally
+        - Both
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      description: Include the version if you know it.
+      placeholder: Chrome 141 on Android 15
+    validations:
+      required: false
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console or terminal output
+      description: Paste any errors. This is formatted as code automatically.
+      render: shell
+    validations:
+      required: false
