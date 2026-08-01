@@ -39,9 +39,19 @@ const variants: Record<Variant, string> = {
     "border border-transparent text-ink-muted hover:bg-white/[0.05] hover:text-ink",
 };
 
+/*
+ * Heights are raised on mobile to clear the 44px touch minimum (48px for the
+ * two primary sizes), then pinned back to the original values from `lg` so the
+ * desktop rendering is byte-identical.
+ *
+ *   size   mobile   desktop
+ *   sm     44px     36px
+ *   md     48px     44px
+ *   lg     52px     52px
+ */
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-4 text-[0.8125rem]",
-  md: "h-11 px-5 text-sm",
+  sm: "h-11 px-4 text-[0.8125rem] lg:h-9",
+  md: "h-12 px-5 text-sm lg:h-11",
   lg: "h-13 px-7 text-[0.9375rem]",
 };
 
