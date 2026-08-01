@@ -32,7 +32,7 @@ export async function Projects() {
     <section
       id="projects"
       aria-labelledby="projects-title"
-      className="relative scroll-mt-28 py-28 sm:py-36"
+      className="relative scroll-mt-24 py-16 sm:py-24 lg:scroll-mt-28 lg:py-36"
     >
       <Container size="wide">
         <SectionHeading
@@ -59,7 +59,7 @@ export async function Projects() {
             <RevealGroup
               as="ul"
               stagger={0.07}
-              className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-5 lg:mt-16 lg:grid-cols-3"
             >
               {repos.map((repo) => (
                 <RevealItem

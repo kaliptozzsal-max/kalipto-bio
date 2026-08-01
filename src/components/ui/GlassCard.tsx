@@ -31,9 +31,13 @@ export function GlassCard({
   return (
     <Tag
       className={cn(
-        "group relative isolate overflow-hidden rounded-3xl glass lit-edge",
+        // 20px radius on mobile, back to the original 24px from `sm`. A large
+        // radius reads as heavier when the card is full-bleed and narrow.
+        "group relative isolate overflow-hidden rounded-[1.25rem] glass lit-edge sm:rounded-3xl",
         interactive &&
-          "transition-[transform,border-color,box-shadow] duration-400 ease-out will-change-transform hover:-translate-y-1.5 hover:border-electric-500/35 hover:shadow-[0_28px_70px_-34px_rgba(10,132,255,0.5)]",
+          // The lift and glow are gated to `lg` and a real hover-capable
+          // pointer. On touch these only ever fire as a stuck state after a tap.
+          "transition-[transform,border-color,box-shadow] duration-400 ease-out lg:will-change-transform lg:hover:-translate-y-1.5 lg:hover:border-electric-500/35 lg:hover:shadow-[0_28px_70px_-34px_rgba(10,132,255,0.5)]",
         className,
       )}
     >

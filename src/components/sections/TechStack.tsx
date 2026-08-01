@@ -9,7 +9,7 @@ export function TechStack() {
     <section
       id="stack"
       aria-labelledby="stack-title"
-      className="relative scroll-mt-28 py-28 sm:py-36"
+      className="relative scroll-mt-24 py-16 sm:py-24 lg:scroll-mt-28 lg:py-36"
     >
       <Container size="wide">
         <SectionHeading
@@ -26,7 +26,7 @@ export function TechStack() {
         <RevealGroup
           as="ul"
           stagger={0.04}
-          className="mt-16 grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6"
+          className="mt-10 grid grid-cols-3 gap-2.5 sm:mt-14 sm:grid-cols-4 sm:gap-4 lg:mt-16 lg:grid-cols-6"
         >
           {techStack.map((tech) => (
             <RevealItem key={tech.name} as="li" variant="scaleIn">
@@ -42,7 +42,7 @@ export function TechStack() {
                   aria-hidden="true"
                   className="size-7 text-ink-muted transition-[color,transform] duration-500 ease-out group-hover:scale-110 group-hover:text-[var(--brand)] sm:size-8"
                 />
-                <span className="px-1.5 text-center font-mono text-[0.625rem] leading-tight tracking-[0.08em] text-ink-faint uppercase transition-colors duration-500 group-hover:text-ink sm:text-[0.6875rem]">
+                <span className="px-1 text-center font-mono text-xs leading-tight tracking-[0.04em] text-ink-faint uppercase transition-colors duration-500 group-hover:text-ink min-[400px]:tracking-[0.08em] sm:px-1.5 lg:text-[0.6875rem]">
                   {tech.name}
                 </span>
               </div>

@@ -12,7 +12,7 @@ export function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-title"
-      className="relative scroll-mt-28 py-28 sm:py-36"
+      className="relative scroll-mt-24 py-16 sm:py-24 lg:scroll-mt-28 lg:py-36"
     >
       <Container>
         <SectionHeading
@@ -26,7 +26,7 @@ export function Contact() {
           subtitle="Happy to talk about security, AI, automation or clinical technology — or just to compare notes on something you're learning."
         />
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+        <div className="mt-10 grid gap-4 sm:mt-14 sm:gap-6 lg:mt-16 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           {/* ---------- Channels + location ---------- */}
           <div className="flex flex-col gap-4">
             <Reveal variant="slideUp">
@@ -64,7 +64,7 @@ export function Contact() {
                           <span className="block text-[0.875rem] font-medium text-ink">
                             {channel.label}
                           </span>
-                          <span className="block truncate font-mono text-[0.6875rem] text-ink-faint">
+                          <span className="block truncate font-mono text-xs text-ink-faint lg:text-[0.6875rem] lg:leading-normal">
                             {channel.handle}
                           </span>
                         </span>

@@ -9,7 +9,7 @@ export function About() {
     <section
       id="about"
       aria-labelledby="about-title"
-      className="relative scroll-mt-28 py-28 sm:py-36"
+      className="relative scroll-mt-24 py-16 sm:py-24 lg:scroll-mt-28 lg:py-36"
     >
       <Container>
         <SectionHeading
@@ -23,7 +23,7 @@ export function About() {
           subtitle="A short introduction to how I work and what keeps me interested."
         />
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+        <div className="mt-10 grid gap-4 sm:mt-14 sm:gap-6 lg:mt-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <Reveal variant="blurReveal">
             <GlassCard
               interactive={false}

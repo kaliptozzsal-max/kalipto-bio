@@ -17,7 +17,7 @@ export function CurrentFocus() {
     <section
       id="focus"
       aria-labelledby="focus-title"
-      className="relative scroll-mt-28 py-28 sm:py-36"
+      className="relative scroll-mt-24 py-16 sm:py-24 lg:scroll-mt-28 lg:py-36"
     >
       <Container size="wide">
         <SectionHeading
@@ -35,7 +35,7 @@ export function CurrentFocus() {
         <RevealGroup
           as="ul"
           stagger={0.08}
-          className="mt-16 grid gap-5 md:grid-cols-2"
+          className="mt-10 grid gap-4 sm:mt-14 sm:gap-5 md:grid-cols-2 lg:mt-16"
         >
           {focusAreas.map((area) => {
             const Icon = skillIcons[area.icon];

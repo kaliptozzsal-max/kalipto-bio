@@ -82,7 +82,7 @@ export default async function NotePage({ params }: PageProps) {
   };
 
   return (
-    <article className="relative pt-36 pb-28 sm:pt-40 sm:pb-36">
+    <article className="relative pt-28 pb-16 sm:pt-32 sm:pb-24 lg:pt-40 lg:pb-36">
       <Container size="narrow">
         <Link
           href="/notes"
