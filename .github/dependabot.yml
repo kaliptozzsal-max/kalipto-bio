@@ -1,0 +1,68 @@
+version: 2
+
+updates:
+  # ---------------------------------------------------------------------------
+  # npm dependencies
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+      timezone: Asia/Phnom_Penh
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: scope
+    labels:
+      - dependencies
+
+    # Minor and patch bumps are grouped into a single pull request so routine
+    # upkeep is one review rather than a dozen. Majors stay separate, because
+    # they carry breaking changes that deserve individual attention.
+    groups:
+      production-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      development-minor-patch:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+    ignore:
+      # React and Next.js majors are deliberately manual: they require reading
+      # an upgrade guide, not merging a green PR.
+      - dependency-name: next
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react-dom
+        update-types: ["version-update:semver-major"]
+
+  # ---------------------------------------------------------------------------
+  # GitHub Actions used by the workflows above
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+      timezone: Asia/Phnom_Penh
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(ci)"
+      include: scope
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions:
+        patterns:
+          - "*"
