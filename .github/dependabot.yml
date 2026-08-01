@@ -14,9 +14,11 @@ updates:
     open-pull-requests-limit: 5
     versioning-strategy: increase
     commit-message:
+      # No `include: scope` here — Dependabot appends the scope itself, which
+      # combined with a prefix that already names it produced titles like
+      # "chore(deps-dev)(deps-dev): bump ...".
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
-      include: scope
     labels:
       - dependencies
 
@@ -29,6 +31,13 @@ updates:
         update-types:
           - minor
           - patch
+        exclude-patterns:
+          # react-icons ships icon removals in MINOR releases, because it
+          # tracks Simple Icons and brands come and go. 5.7.0 dropped both
+          # SiOpenai and SiLinkedin, which this project imports, and CI caught
+          # it as a type error. Excluding it from the group means its updates
+          # arrive as a standalone PR that gets read rather than rubber-stamped.
+          - react-icons
       development-minor-patch:
         dependency-type: development
         update-types:
@@ -36,13 +45,22 @@ updates:
           - patch
 
     ignore:
-      # React and Next.js majors are deliberately manual: they require reading
-      # an upgrade guide, not merging a green PR.
+      # Framework majors are deliberately manual: they require reading an
+      # upgrade guide, not merging a green PR.
       - dependency-name: next
         update-types: ["version-update:semver-major"]
       - dependency-name: react
         update-types: ["version-update:semver-major"]
       - dependency-name: react-dom
+        update-types: ["version-update:semver-major"]
+      # Toolchain majors have to move together with eslint-config-next, which
+      # constrains which versions actually work. Individually they only ever
+      # produce PRs that cannot pass CI.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
 
   # ---------------------------------------------------------------------------
@@ -58,7 +76,6 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(ci)"
-      include: scope
     labels:
       - dependencies
       - github-actions
