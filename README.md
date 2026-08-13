@@ -48,6 +48,7 @@ four.
 - **Notes** — MDX with YAML frontmatter, drafts, reading time, RSS feed,
   per-note Open Graph images, sitemap entries, and build-time syntax
   highlighting via Shiki (no client-side JavaScript for code blocks).
+- **Proxy Scraper** — a developer tool that aggregates and validates free HTTP/SOCKS proxies from multiple public sources, exposed via a dedicated API and UI.
 - **SEO** — per-route metadata, canonical URLs, Open Graph and Twitter cards,
   generated favicons and social images, `robots.txt`, `sitemap.xml`, JSON-LD
   `Person` and `BlogPosting` structured data.

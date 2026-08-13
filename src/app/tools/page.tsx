@@ -10,7 +10,7 @@ import { siteConfig } from "@/data/site";
 export const metadata: Metadata = {
   title: "Developer Tools",
   description:
-    "Free browser-based developer tools — JSON formatter, JWT decoder, Base64, UUID generator, hash generator, regex tester, timestamp converter, URL encoder, and Markdown preview. No data leaves your device.",
+    "Free browser-based developer tools — JSON formatter, JWT decoder, Base64, UUID generator, hash generator, regex tester, timestamp converter, URL encoder, Markdown preview, and Proxy scraper. No data leaves your device.",
   alternates: { canonical: "/tools" },
   openGraph: {
     type: "website",
@@ -82,6 +82,12 @@ const tools: Tool[] = [
     name: "Markdown Preview",
     description: "Write Markdown and see a live rendered preview side by side.",
     icon: "MD",
+  },
+  {
+    slug: "proxy",
+    name: "Proxy Scraper",
+    description: "Scrape and list free HTTP, SOCKS4, and SOCKS5 proxies from public sources.",
+    icon: "PX",
   },
 ];
 
