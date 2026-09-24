@@ -14,14 +14,16 @@ export const metadata: Metadata = {
     description:
       "Capture ten harmless flags across four difficulty tiers in Kalipto's isolated mobile-friendly CTF sandbox.",
   },
-  // Meta Leak level clue — a fixed, non-secret training flag.
-  other: { "ctf-clue": "KALIPTO{META_LEAK}" },
+  // Vigenere Meta level clue — ciphertext, decrypted with key REDNODE.
+  other: { "ctf-clue": "MMJRBHVVGUNQNIU" },
 };
 
 export default function ChallengePage() {
   return (
     <>
-      <span hidden aria-hidden="true" data-ctf-flag="KALIPTO{SOURCE_GHOST}" />
+      {/* Split Ghost: the flag is split across two attributes and must be joined. */}
+      <span hidden aria-hidden="true" data-ctf-part-1="KALIPTO{SPLIT_" />
+      <span hidden aria-hidden="true" data-ctf-part-2="DOM_GHOST}" />
       <ChallengeArena />
     </>
   );

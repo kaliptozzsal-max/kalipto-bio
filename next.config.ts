@@ -88,6 +88,17 @@ const challengeSecurityHeaders = securityHeaders.map((header) =>
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+
+  /*
+   * Do not ship browser source maps in production. The browser still receives
+   * the app as minified, mangled bundles (that is unavoidable — all client code
+   * is downloaded to run), but without source maps the original TypeScript and
+   * component structure cannot be reconstructed in DevTools. This is the real,
+   * effective way to keep source private; JavaScript "F12 blockers" do not work
+   * and only harm normal users.
+   */
+  productionBrowserSourceMaps: false,
+
   // Private Wi-Fi origin used for phone testing of dev-only assets/HMR.
   allowedDevOrigins: ["192.168.1.222"],
 

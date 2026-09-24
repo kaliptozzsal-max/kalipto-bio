@@ -9,11 +9,15 @@ export const CHALLENGE_LEVEL_IDS = [
   "epoch",
   "xor",
   "vault",
+  "jwt",
+  "crack",
+  "xorkey",
+  "chain",
 ] as const;
 
 export type ChallengeLevelId = (typeof CHALLENGE_LEVEL_IDS)[number];
 
-export type ChallengeTier = "Easy" | "Medium" | "Hard" | "Insane";
+export type ChallengeTier = "Medium" | "Hard" | "Insane" | "Operator";
 
 export type ChallengeLevel = {
   id: ChallengeLevelId;
@@ -27,148 +31,216 @@ export type ChallengeLevel = {
   hint: string;
 };
 
-/** Fixed, precomputed puzzle payloads. No secrets are exposed by these. */
-export const CIPHER_TRANSMISSION = "S0FMSVBUT3tDSVBIRVJfTk9ERX0=";
-export const ROT13_TRANSMISSION = "XNYVCGB{EBGNGVBA_ERYNL}";
+/**
+ * Fixed, precomputed puzzle payloads. Every value is a scrambled/encoded form
+ * of a training flag — no real secret is exposed by any of these.
+ */
+export const CIPHER_TRANSMISSION = "UzBGTVNWQlVUM3RFVDFWQ1RFVmZRalkwZlE9PQ==";
+export const ROT13_TRANSMISSION = "zp{x!%~L#~%cf0|x##~#N";
+export const BASE32_TRANSMISSION = "JNAUYSKQKRHXWQSBKNCTGMS7JZHUIRL5";
 export const XOR_TRANSMISSION =
-  "61 6b 66 63 7a 7e 65 51 72 65 78 75 7a 62 6b 64 7e 65 67 57";
-export const XOR_KEY_HEX = "0x2A";
-export const EPOCH_TRANSMISSION = "1700000000";
+  "0c 09 03 1a 04 13 07 34 0b 1b 15 17 08 1b 1b 14 1c 10 18 11 1e 35";
+export const VAULT_TRANSMISSION = "fUFWTlVQX1JZQ1ZFR3tCR0NWWU5Y";
+export const VIGENERE_TRANSMISSION = "MMJRBHVVGUNQNIU";
+export const VIGENERE_KEY = "REDNODE";
+
+/** Operator-tier payloads. All fixed; nothing here exposes a real secret. */
+export const JWT_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZ3Vlc3QiLCJyb2xlIjoiZ3Vlc3QifQ.jET63ZQk3xQ5gvw6y9bjMVd4tGcPMrfYFT_BA36p5AM";
+export const JWT_SECRET = "kalipto";
+export const HASHCRACK_TARGET =
+  "a3ee76bc34cc901c001c6d6ca332c0eb14d6ad825ebe529a531482859344d885";
+export const XORKEY_TRANSMISSION =
+  "19 72 08 1b 63 10 1d 48 1c 1d 61 1b 19 76 1d 0d 61 77 16 4e";
 
 export const tierOrder: readonly ChallengeTier[] = [
-  "Easy",
   "Medium",
   "Hard",
   "Insane",
+  "Operator",
 ];
 
 export const challengeLevels: readonly ChallengeLevel[] = [
   {
     id: "source",
     number: "01",
-    name: "Source Ghost",
+    name: "Split Ghost",
     vector: "DOM reconnaissance",
-    tier: "Easy",
-    points: 100,
+    tier: "Medium",
+    points: 200,
     briefing:
-      "A training flag is hidden in a data attribute inside this page's rendered HTML.",
+      "The flag was split into two halves and hidden in separate data attributes so a casual glance misses it.",
     objective:
-      "Inspect the page source or element tree and locate the KALIPTO{...} marker. Phone operators can use the built-in DOM scanner.",
-    hint: "Search for an element carrying the data-ctf-flag attribute.",
+      "Find both data-ctf-part-1 and data-ctf-part-2 in the rendered HTML, concatenate them in order, and submit the result.",
+    hint: "Search the DOM for elements with data-ctf-part-1 and data-ctf-part-2, then join the two values.",
   },
   {
     id: "robots",
     number: "02",
     name: "Robots Whisper",
-    vector: "Public text discovery",
-    tier: "Easy",
-    points: 100,
+    vector: "Base64 in public text",
+    tier: "Medium",
+    points: 220,
     briefing:
-      "A fictional crawler policy contains a training flag and points toward the header probe.",
+      "A fictional crawler policy hides a Base64 string in a comment. Encoding is not secrecy.",
     objective:
-      "Open /challenge/robots.txt, inspect its plain text, and recover the flag.",
-    hint: "Robots files are public hints, not access-control systems.",
+      "Open /challenge/robots.txt, extract the Base64 blob from the comment, decode it, and submit the flag.",
+    hint: "The commented value is standard Base64. Decode it to reveal KALIPTO{...}.",
   },
   {
     id: "cipher",
     number: "03",
-    name: "Cipher Node",
-    vector: "Base64 decoding",
-    tier: "Easy",
-    points: 120,
+    name: "Double Cipher",
+    vector: "Layered Base64",
+    tier: "Medium",
+    points: 240,
     briefing:
-      "An intercepted transmission uses Base64 encoding. Encoding is not encryption.",
-    objective: "Decode the payload and submit the resulting KALIPTO{...} flag.",
-    hint: "Use the site's Base64 tool or any local decoder.",
+      "This transmission was Base64-encoded twice. One decode is never enough.",
+    objective:
+      "Decode the payload, notice the result is still Base64, decode again, and submit the flag.",
+    hint: "Decode with the Base64 tool, feed the output back into it, and decode a second time.",
   },
   {
     id: "header",
     number: "04",
-    name: "Header Specter",
-    vector: "Response-header inspection",
-    tier: "Medium",
-    points: 160,
+    name: "Hex Specter",
+    vector: "Hex-encoded response header",
+    tier: "Hard",
+    points: 300,
     briefing:
-      "The fixed training probe returns a harmless clue through an HTTP response header.",
+      "The training probe returns the flag hex-encoded inside a response header, not the body.",
     objective:
-      "Inspect GET /api/challenge/probe and find the X-Kalipto-Flag header. The in-page probe works on phones.",
-    hint: "The JSON body tells you which response header to inspect.",
+      "Inspect GET /api/challenge/probe, read the X-Kalipto-Hex header, convert the hex bytes to ASCII, and submit the flag.",
+    hint: "Each pair of hex characters is one ASCII byte. The in-page probe shows the header value.",
   },
   {
     id: "cookie",
     number: "05",
     name: "Cookie Trail",
-    vector: "Client cookie inspection",
-    tier: "Medium",
-    points: 170,
+    vector: "Base64url cookie",
+    tier: "Hard",
+    points: 320,
     briefing:
-      "The challenge sets a harmless, non-secret training cookie in your browser.",
+      "A training cookie holds the flag in Base64url — the URL-safe variant with - and _ instead of + and /.",
     objective:
-      "Read the ctf_trail cookie for this page and submit its flag value. The in-page reader works on phones.",
-    hint: "Inspect document.cookie or use the built-in cookie reader below.",
+      "Run the probe, read the ctf_trail cookie, decode it as Base64url, and submit the flag.",
+    hint: "Base64url uses - and _ and drops padding. Convert it to standard Base64 or use a Base64url decoder.",
   },
   {
     id: "meta",
     number: "06",
-    name: "Meta Leak",
-    vector: "Metadata inspection",
-    tier: "Medium",
-    points: 180,
+    name: "Vigenere Meta",
+    vector: "Vigenere cipher",
+    tier: "Hard",
+    points: 380,
     briefing:
-      "A fixed training clue is embedded in a meta tag inside the page head.",
+      "A meta tag carries a Vigenere-encrypted word. The repeating key is provided; the wrapper KALIPTO{...} is not encrypted.",
     objective:
-      "Find the meta tag named ctf-clue and submit the flag it carries.",
-    hint: "Look in the document head for <meta name=\"ctf-clue\">.",
+      "Decrypt the ctf-clue meta value with the key REDNODE and submit KALIPTO{DECRYPTED}.",
+    hint: "Vigenere decrypt: plain[i] = (cipher[i] - key[i]) mod 26. Wrap the decrypted word in KALIPTO{...}.",
   },
   {
     id: "rot13",
     number: "07",
-    name: "Rotation Relay",
-    vector: "ROT13 substitution",
+    name: "ROT47 Mirror",
+    vector: "ROT47 substitution",
     tier: "Hard",
-    points: 220,
+    points: 400,
     briefing:
-      "A classic rotation cipher scrambled this transmission. Rotation is reversible.",
-    objective: "Reverse the ROT13 payload and submit the recovered flag.",
-    hint: "ROT13 shifts each letter by 13 places; applying it twice restores the text.",
+      "Not ROT13. This uses ROT47, which rotates the full printable ASCII range, braces and underscores included.",
+    objective:
+      "Apply ROT47 (rotate by 47 within ASCII 33-126) to the payload and submit the recovered flag.",
+    hint: "ROT47 is its own inverse over ASCII 33..126. Applying it again restores the original text.",
   },
   {
     id: "epoch",
     number: "08",
-    name: "Epoch Lock",
-    vector: "Timestamp conversion",
-    tier: "Hard",
-    points: 240,
+    name: "Base32 Node",
+    vector: "Base32 decoding",
+    tier: "Insane",
+    points: 460,
     briefing:
-      "The lock derives its flag from a Unix timestamp converted to a UTC date.",
+      "This uses Base32 (RFC 4648), not Base64. The alphabet is A-Z and 2-7 with = padding.",
     objective:
-      "Convert the epoch to a UTC date and submit KALIPTO{EPOCH_LOCK} once you confirm the year and month.",
-    hint: "Convert 1700000000 with the site's Timestamp tool; the intended flag is KALIPTO{EPOCH_LOCK}.",
+      "Decode the Base32 payload to ASCII and submit the flag.",
+    hint: "Base32 packs 5 bits per character. Use a Base32 decoder, not Base64.",
   },
   {
     id: "xor",
     number: "09",
     name: "XOR Phantom",
-    vector: "XOR decryption",
-    tier: "Hard",
-    points: 300,
+    vector: "Repeating-key XOR",
+    tier: "Insane",
+    points: 520,
     briefing:
-      "A single-byte XOR obscured this transmission. XOR with the same key reverses it.",
+      "A multi-byte repeating key XORed this transmission. A single byte will not do it.",
     objective:
-      "XOR each hex byte with the given key and submit the decoded flag.",
-    hint: "XOR every byte with 0x2A (42), then read the ASCII characters.",
+      "Recover the 5-character key using the known prefix KALIPTO{, decrypt the full buffer, and submit the flag.",
+    hint: "key[i] = cipher[i] XOR knownPlain[i] over the first 8 bytes. The key repeats every 5 bytes.",
   },
   {
     id: "vault",
     number: "10",
-    name: "Red Ghost Vault",
-    vector: "Final identity puzzle",
+    name: "Triple Chain",
+    vector: "Multi-round decode chain",
     tier: "Insane",
-    points: 500,
+    points: 650,
     briefing:
-      "The final lock combines the interface color with the stealth identity used throughout the operation.",
+      "Three transforms were stacked. Peel them in the exact reverse order they were applied.",
     objective:
-      "Submit KALIPTO{COLOR_IDENTITY} using uppercase words separated by an underscore.",
-    hint: "The site is red. A hidden operator is often called a ghost.",
+      "The payload is base64( reverse( rot13( flag ) ) ). Reverse each step — Base64 decode, reverse the string, then ROT13 — and submit the flag.",
+    hint: "Order matters: Base64-decode first, reverse the characters, then apply ROT13.",
+  },
+  {
+    id: "jwt",
+    number: "11",
+    name: "Token Forge",
+    vector: "JWT / HS256 analysis",
+    tier: "Operator",
+    points: 700,
+    briefing:
+      "A HS256 JSON Web Token was issued to a guest. The signing secret leaked. Understand how the signature is built.",
+    objective:
+      "Decode the token, recompute a valid HS256 signature for a payload where role is admin using the leaked secret, and submit KALIPTO{FORGED_ADMIN}.",
+    hint: "signature = base64url(HMAC-SHA256(header + '.' + payload, secret)). Secret is provided below. Change role to admin and re-sign.",
+  },
+  {
+    id: "crack",
+    number: "12",
+    name: "Hash Crack",
+    vector: "Brute-force / SHA-256",
+    tier: "Operator",
+    points: 800,
+    briefing:
+      "A 4-digit numeric PIN was hashed with a single unsalted SHA-256 pass — exactly why fast hashes are unsafe for secrets.",
+    objective:
+      "Recover the PIN by brute forcing all 0000-9999 against the target digest, then submit KALIPTO{PIN} with the digits.",
+    hint: "Only 10,000 candidates. Loop each, sha256 it, compare to the target. A few lines in any language.",
+  },
+  {
+    id: "xorkey",
+    number: "13",
+    name: "Key Recovery",
+    vector: "Known-plaintext / repeating-key XOR",
+    tier: "Operator",
+    points: 900,
+    briefing:
+      "This ciphertext uses a short repeating-key XOR. Every KALIPTO flag begins with a known prefix — that is enough to recover the key.",
+    objective:
+      "Use the known plaintext 'KALIPTO{' against the first bytes to recover the repeating key, decrypt the rest, and submit the flag.",
+    hint: "key[i] = cipher[i] XOR knownPlain[i]. The key is 3 uppercase characters and repeats. Decrypt the full buffer with it.",
+  },
+  {
+    id: "chain",
+    number: "14",
+    name: "Operator Ascended",
+    vector: "Multi-step reasoning",
+    tier: "Operator",
+    points: 1200,
+    briefing:
+      "The final lock only opens for an operator who cleared the whole ladder. Combine what the journey taught you.",
+    objective:
+      "Once every prior flag is solved, submit KALIPTO{OPERATOR_ASCENDED}.",
+    hint: "You earned this rank by finishing the operation. Submit the ascended operator flag.",
   },
 ] as const;

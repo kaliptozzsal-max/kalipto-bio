@@ -103,7 +103,7 @@ export function HackerAvatar({ level, rank, progress }: HackerAvatarProps) {
       </m.div>
 
       <figcaption className="sr-only">
-        Kalipto hacker profile avatar, level {level}, rank {rank}
+        Kalipto profile avatar, level {level}, rank {rank}
       </figcaption>
     </figure>
   );

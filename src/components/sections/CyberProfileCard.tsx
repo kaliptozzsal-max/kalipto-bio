@@ -136,7 +136,7 @@ export function CyberProfileCard() {
 
           <div className="absolute -top-3 left-5 inline-flex items-center gap-2 rounded-xl border border-electric-500/30 bg-void-900/95 px-3 py-2 text-[0.6875rem] font-semibold tracking-[0.1em] text-electric-100 uppercase shadow-xl backdrop-blur-md [transform:translateZ(72px)] sm:left-8">
             <span className="size-1.5 rounded-full bg-electric-400 shadow-[0_0_12px_rgba(249,79,97,1)]" />
-            Kalipto // dark web
+            Kalipto
           </div>
 
           <div className="absolute -right-2 bottom-5 rounded-xl border border-electric-500/25 bg-void-900/95 px-3 py-2 text-xs font-semibold text-ink shadow-xl backdrop-blur-md [transform:translateZ(82px)] sm:-right-4 sm:bottom-8">

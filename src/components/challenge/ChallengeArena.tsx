@@ -14,11 +14,16 @@ import {
 } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import {
+  BASE32_TRANSMISSION,
   CIPHER_TRANSMISSION,
-  EPOCH_TRANSMISSION,
+  HASHCRACK_TARGET,
+  JWT_SECRET,
+  JWT_TOKEN,
   ROT13_TRANSMISSION,
-  XOR_KEY_HEX,
+  VAULT_TRANSMISSION,
+  VIGENERE_KEY,
   XOR_TRANSMISSION,
+  XORKEY_TRANSMISSION,
   challengeLevels,
   tierOrder,
   type ChallengeLevelId,
@@ -36,10 +41,10 @@ type Feedback = { tone: "success" | "error"; message: string };
 type ProbeOutput = { body: string; flag: string; cookie: string };
 
 const tierStyles: Record<ChallengeTier, string> = {
-  Easy: "border-emerald-400/30 bg-emerald-400/[0.08] text-emerald-200",
-  Medium: "border-amber-400/30 bg-amber-400/[0.08] text-amber-200",
+  Medium: "border-emerald-400/30 bg-emerald-400/[0.08] text-emerald-200",
   Hard: "border-orange-500/30 bg-orange-500/[0.08] text-orange-200",
   Insane: "border-electric-500/40 bg-electric-500/[0.1] text-electric-100",
+  Operator: "border-fuchsia-500/40 bg-fuchsia-500/[0.1] text-fuchsia-200",
 };
 
 async function copyText(value: string) {
@@ -99,10 +104,15 @@ export function ChallengeArena() {
   }
 
   function runSourceScanner() {
-    const marker = document.querySelector<HTMLElement>("[data-ctf-flag]");
-    setSourceOutput(
-      marker?.dataset.ctfFlag ?? "No training marker found in this document.",
-    );
+    const part1 = document.querySelector<HTMLElement>("[data-ctf-part-1]")
+      ?.dataset.ctfPart1;
+    const part2 = document.querySelector<HTMLElement>("[data-ctf-part-2]")
+      ?.dataset.ctfPart2;
+    if (part1 && part2) {
+      setSourceOutput(`part1="${part1}"  part2="${part2}"  →  join them`);
+    } else {
+      setSourceOutput("No split training markers found in this document.");
+    }
   }
 
   function runMetaScanner() {
@@ -139,7 +149,7 @@ export function ChallengeArena() {
       }
       setProbeOutput({
         body,
-        flag: response.headers.get("x-kalipto-flag") ?? "Header not exposed.",
+        flag: response.headers.get("x-kalipto-hex") ?? "Header not exposed.",
         cookie,
       });
     } catch {
@@ -409,8 +419,8 @@ export function ChallengeArena() {
                     Run phone DOM scanner
                   </Button>
                   {sourceOutput ? (
-                    <pre className={`${styles.terminalOutput} mt-3 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap text-electric-200`}>
-                      data-ctf-flag=&quot;{sourceOutput}&quot;
+                    <pre className={`${styles.terminalOutput} mt-3 p-4 font-mono text-xs leading-relaxed whitespace-pre-wrap break-all text-electric-200`}>
+                      {sourceOutput}
                     </pre>
                   ) : null}
                 </div>
@@ -453,8 +463,8 @@ export function ChallengeArena() {
                   {probeOutput ? (
                     <div className={`${styles.terminalOutput} mt-3 space-y-2 p-4 font-mono text-xs leading-relaxed`}>
                       <p className="text-ink-faint">GET /api/challenge/probe → 200</p>
-                      <p className="break-all text-electric-200">X-Kalipto-Flag: {probeOutput.flag}</p>
-                      <p className="break-all text-ink-muted">BODY: {probeOutput.body}</p>
+                      <p className="break-all text-electric-200">X-Kalipto-Hex: {probeOutput.flag}</p>
+                      <p className="text-ink-faint">Convert each hex byte pair to ASCII.</p>
                     </div>
                   ) : null}
                 </div>
@@ -486,41 +496,83 @@ export function ChallengeArena() {
                 </div>
               ) : null}
 
+              {activeId === "meta" && metaOutput ? (
+                <p className="mt-3 text-xs text-ink-faint">
+                  Vigenere key = <span className="text-electric-200">{VIGENERE_KEY}</span>. Decrypt, then wrap in KALIPTO&#123;...&#125;.
+                </p>
+              ) : null}
+
               {activeId === "rot13" ? (
                 <div>
                   <p className="overflow-x-auto rounded-xl border border-electric-500/20 bg-black/40 p-4 font-mono text-sm tracking-[0.08em] text-electric-100">
                     {ROT13_TRANSMISSION}
                   </p>
                   <p className="mt-2 text-xs text-ink-faint">
-                    Apply ROT13 to reverse this classical rotation cipher.
+                    This is ROT47 (ASCII 33-126), not ROT13. Applying ROT47 again reverses it.
                   </p>
                 </div>
               ) : null}
 
               {activeId === "epoch" ? (
                 <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
-                  <p className="text-electric-300">UNIX_EPOCH = {EPOCH_TRANSMISSION}</p>
-                  <p>TARGET_FLAG = KALIPTO&#123;EPOCH_LOCK&#125;</p>
-                  <Link href="/tools/timestamp" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-electric-200 hover:text-electric-100">
-                    <CodeIcon className="size-4" /> Open timestamp tool
-                  </Link>
+                  <p className="text-electric-300 break-all">BASE32 = {BASE32_TRANSMISSION}</p>
+                  <p>Alphabet A-Z + 2-7. Decode to ASCII (not Base64).</p>
                 </div>
               ) : null}
 
               {activeId === "xor" ? (
                 <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
                   <p className="text-electric-300 break-all">CIPHER = {XOR_TRANSMISSION}</p>
-                  <p>KEY = {XOR_KEY_HEX} (single-byte XOR)</p>
-                  <p>Decode each byte: char = byte XOR key, then read ASCII.</p>
+                  <p>Repeating-key XOR · known prefix KALIPTO&#123; · 5-char key</p>
+                  <p>key[i] = cipher[i] XOR known[i]; then decrypt the whole buffer.</p>
                 </div>
               ) : null}
 
               {activeId === "vault" ? (
-                <div className={`${styles.terminalOutput} p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
-                  <p className="text-electric-300">FINAL_LOCK::ACTIVE</p>
-                  <p className="mt-2">FORMAT = KALIPTO&#123;COLOR_IDENTITY&#125;</p>
-                  <p>COLOR = dominant interface accent</p>
-                  <p>IDENTITY = stealth operator archetype</p>
+                <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
+                  <p className="text-electric-300 break-all">PAYLOAD = {VAULT_TRANSMISSION}</p>
+                  <p>ENCODED AS base64( reverse( rot13( flag ) ) )</p>
+                  <p>Reverse the steps: Base64-decode → reverse string → ROT13.</p>
+                </div>
+              ) : null}
+
+              {activeId === "jwt" ? (
+                <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
+                  <p className="text-electric-300">ALG = HS256</p>
+                  <p className="break-all">TOKEN = {JWT_TOKEN}</p>
+                  <p>LEAKED_SECRET = {JWT_SECRET}</p>
+                  <p className="text-ink-faint">
+                    signature = base64url(HMAC-SHA256(header + &quot;.&quot; + payload, secret))
+                  </p>
+                  <p>Forge role=admin, re-sign, then submit KALIPTO&#123;FORGED_ADMIN&#125;.</p>
+                </div>
+              ) : null}
+
+              {activeId === "crack" ? (
+                <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
+                  <p className="text-electric-300 break-all">SHA256_TARGET = {HASHCRACK_TARGET}</p>
+                  <p>SPACE = 0000..9999 (unsalted, single pass)</p>
+                  <p>Recover the PIN, then submit KALIPTO&#123;PIN&#125;.</p>
+                  <Link href="/tools/hash" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-electric-200 hover:text-electric-100">
+                    <CodeIcon className="size-4" /> Open hash tool
+                  </Link>
+                </div>
+              ) : null}
+
+              {activeId === "xorkey" ? (
+                <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
+                  <p className="text-electric-300 break-all">CIPHER = {XORKEY_TRANSMISSION}</p>
+                  <p>KNOWN_PLAINTEXT = KALIPTO&#123;</p>
+                  <p>key[i] = cipher[i] XOR known[i] · key is 3 chars, repeating</p>
+                  <p>Recover the key, decrypt the buffer, submit the flag.</p>
+                </div>
+              ) : null}
+
+              {activeId === "chain" ? (
+                <div className={`${styles.terminalOutput} space-y-2 p-4 font-mono text-xs leading-relaxed text-ink-muted`}>
+                  <p className="text-electric-300">ASCENSION_LOCK::{solvedCount >= challengeLevels.length - 1 ? "READY" : "SEALED"}</p>
+                  <p>Cleared flags: {solvedCount}/{challengeLevels.length}</p>
+                  <p>Finish every prior level, then submit KALIPTO&#123;OPERATOR_ASCENDED&#125;.</p>
                 </div>
               ) : null}
             </div>

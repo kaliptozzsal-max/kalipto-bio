@@ -1,9 +1,10 @@
+// The flag is Base64-encoded inside a comment. Encoding is not access control.
 const clue = `User-agent: *
 Disallow: /challenge/training-vault
 
 # This is a fictional CTF clue, not access control.
-# FLAG: KALIPTO{ROBOTS_WHISPER}
-# NEXT: inspect the response headers from /api/challenge/probe
+# ENCODED (base64): S0FMSVBUT3tST0JPVFNfREVDT0RFRH0=
+# NEXT: inspect the X-Kalipto-Hex response header from /api/challenge/probe
 `;
 
 export function GET() {
