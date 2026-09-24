@@ -27,7 +27,10 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
             <ArrowLeftIcon className="size-3.5" />
             All tools
           </Link>
-          <h1 className="text-[clamp(1.5rem,5vw,2rem)] leading-tight font-semibold tracking-tight text-ink">
+          <h1
+            data-text={title}
+            className="cyber-heading cyber-glitch text-[clamp(1.5rem,5vw,2rem)] leading-tight font-semibold tracking-tight text-ink"
+          >
             {title}
           </h1>
           <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-muted">

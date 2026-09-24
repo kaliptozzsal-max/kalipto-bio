@@ -10,14 +10,14 @@ import { siteConfig } from "@/data/site";
 export const metadata: Metadata = {
   title: "Developer Tools",
   description:
-    "Free browser-based developer tools — JSON formatter, JWT decoder, Base64, UUID generator, hash generator, regex tester, timestamp converter, URL encoder, and Markdown preview. No data leaves your device.",
+    "Private browser tools including Camera Lab, JSON formatter, JWT decoder, Base64, UUID, hashes, regex, timestamps, URL encoding, and Markdown preview.",
   alternates: { canonical: "/tools" },
   openGraph: {
     type: "website",
     url: `${siteConfig.url}/tools`,
     title: `Developer Tools — ${siteConfig.name}`,
     description:
-      "Free browser-based developer tools. Everything runs client-side — no data leaves your device.",
+      "Privacy-first browser tools. Your data and camera media stay on your device.",
   },
 };
 
@@ -29,6 +29,13 @@ type Tool = {
 };
 
 const tools: Tool[] = [
+  {
+    slug: "camera",
+    name: "Camera Lab",
+    description:
+      "Take photos or record short silent videos locally — nothing is uploaded.",
+    icon: "CAM",
+  },
   {
     slug: "json",
     name: "JSON Formatter",
@@ -56,7 +63,7 @@ const tools: Tool[] = [
   {
     slug: "hash",
     name: "Hash Generator",
-    description: "Compute MD5, SHA-1, SHA-256, and SHA-512 hashes.",
+    description: "Compute SHA-1, SHA-256, and SHA-512 hashes.",
     icon: "#",
   },
   {
@@ -68,7 +75,8 @@ const tools: Tool[] = [
   {
     slug: "timestamp",
     name: "Timestamp Converter",
-    description: "Convert between Unix timestamps, ISO 8601, and human-readable dates.",
+    description:
+      "Convert between Unix timestamps, ISO 8601, and human-readable dates.",
     icon: "T",
   },
   {
@@ -98,7 +106,7 @@ export default function ToolsPage() {
               <span className="text-gradient">browser</span>
             </>
           }
-          subtitle="No servers, no tracking, no data leaves your device. Built for speed and keyboard-first workflows."
+          subtitle="Private by default: text data and camera media stay on your device. Built for speed and clear workflows."
         />
 
         <Reveal variant="fadeIn" className="mt-6">
@@ -110,7 +118,7 @@ export default function ToolsPage() {
             <kbd className="rounded border border-hairline bg-white/[0.05] px-1.5 py-0.5 text-[0.625rem]">
               Enter
             </kbd>
-            <span className="text-ink-muted">to execute in any tool</span>
+            <span className="text-ink-muted">to execute in supported tools</span>
           </p>
         </Reveal>
 
@@ -120,16 +128,21 @@ export default function ToolsPage() {
           className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3"
         >
           {tools.map((tool) => (
-            <RevealItem key={tool.slug} as="li" variant="slideUp" className="h-full">
+            <RevealItem
+              key={tool.slug}
+              as="li"
+              variant="slideUp"
+              className="h-full"
+            >
               <GlassCard as="article" className="h-full p-0">
                 <Link
                   href={`/tools/${tool.slug}`}
-                  className="flex h-full flex-col rounded-[1.25rem] p-6 sm:rounded-3xl sm:p-7"
+                  className="flex h-full flex-col rounded-2xl p-6 sm:p-7"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span
                       aria-hidden="true"
-                      className="grid size-11 shrink-0 place-items-center rounded-2xl border border-hairline-strong bg-white/[0.05] font-mono text-[0.75rem] font-bold text-electric-300"
+                      className="grid size-11 shrink-0 place-items-center rounded-xl border border-electric-500/25 bg-electric-500/[0.07] font-mono text-[0.6875rem] font-bold text-electric-200"
                     >
                       {tool.icon}
                     </span>

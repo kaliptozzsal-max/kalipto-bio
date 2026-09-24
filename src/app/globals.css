@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@fontsource-variable/oxanium/wght.css";
 
 /* ==========================================================================
    Fonts
@@ -51,43 +52,47 @@
 
 /* ==========================================================================
    Design tokens — Tailwind v4 `@theme`
-   Dark-first, Apple-minimal surfaces with cyberpunk electric-blue accents.
+   Dark-first "dark web" theme: near-black surfaces with blood-red accents.
+   NOTE: the `electric-*` / `cyber-*` token *names* are kept intentionally so
+   the hundreds of existing class references across components don't need to
+   change — only the values they resolve to are retuned to red. This recolours
+   the entire site from one place.
    ========================================================================== */
 @theme {
   /* Typography ---------------------------------------------------------- */
-  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  /* Same family as the body — display character comes from weight + tracking. */
-  --font-display: "Inter", "Inter Fallback", ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", sans-serif;
-  /* Platform monospace — no extra font download for small label text. */
+  /* Terminal-forward: monospace leads the UI to sell the "underground" feel. */
+  --font-sans: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono",
+    "Segoe UI Mono", Menlo, Consolas, "Liberation Mono", "Inter",
+    "Inter Fallback", monospace;
+  --font-display: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono",
+    "Segoe UI Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono",
     "Segoe UI Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* Surfaces ------------------------------------------------------------ */
-  --color-void-950: #04060b;
-  --color-void-900: #070a12;
-  --color-void-850: #0a0e18;
-  --color-void-800: #0e131f;
-  --color-void-700: #161d2c;
-  --color-void-600: #202a3d;
-  --color-void-500: #2c3852;
+  /* Surfaces — pushed toward pure black -------------------------------- */
+  --color-void-950: #010101;
+  --color-void-900: #050202;
+  --color-void-850: #080303;
+  --color-void-800: #0c0404;
+  --color-void-700: #170808;
+  --color-void-600: #240c0c;
+  --color-void-500: #331111;
 
-  /* Accent — electric blue --------------------------------------------- */
-  --color-electric-50: #eaf4ff;
-  --color-electric-100: #d2e7ff;
-  --color-electric-200: #a8d0ff;
-  --color-electric-300: #73b3ff;
-  --color-electric-400: #3d94ff;
-  --color-electric-500: #0a84ff;
-  --color-electric-600: #0066e0;
-  --color-electric-700: #004db0;
-  --color-electric-800: #003780;
-  --color-electric-900: #002454;
+  /* Accent — blood red (mapped onto the old "electric" scale) ---------- */
+  --color-electric-50: #fff0f0;
+  --color-electric-100: #ffd6d6;
+  --color-electric-200: #ffabab;
+  --color-electric-300: #ff6b6b;
+  --color-electric-400: #ff2d2d;
+  --color-electric-500: #e60000;
+  --color-electric-600: #c40000;
+  --color-electric-700: #990000;
+  --color-electric-800: #6e0000;
+  --color-electric-900: #450000;
 
-  /* Secondary glows ----------------------------------------------------- */
-  --color-cyber-cyan: #22d3ee;
-  --color-cyber-violet: #7c5cff;
+  /* Secondary glows — deep crimson instead of cyan/violet -------------- */
+  --color-cyber-cyan: #ff3b3b;
+  --color-cyber-violet: #8b0000;
 
   /* Foreground ---------------------------------------------------------- */
   /*
@@ -246,6 +251,37 @@
   }
 
   /*
+   * "Dark web" CRT scanline overlay (prank theme).
+   *
+   * A single fixed, non-interactive layer painted above the background but
+   * below content. It is transform/opacity-free repeating-gradient work, so it
+   * costs one composited layer and nothing on the main thread. `pointer-events`
+   * is off so it never intercepts clicks, and it is disabled under
+   * `prefers-reduced-motion` alongside a low default opacity to stay readable.
+   */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    /*
+     * Sits above the `-z-10` SiteBackground but below normal-flow content
+     * (nav / main / footer, which stack at auto). This way the scanlines wash
+     * the backdrop without ever dimming text or intercepting input.
+     */
+    z-index: -1;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgb(255 0 0 / 0.05) 0px,
+      rgb(255 0 0 / 0.05) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: screen;
+    opacity: 0.35;
+  }
+
+  /*
    * Remove the grey flash Android paints over tapped elements. Every
    * interactive element here has its own active state, so the default overlay
    * only ever looks like a rendering glitch.
@@ -305,7 +341,7 @@
 
   ::selection {
     background-color: var(--color-electric-500);
-    color: #fff;
+    color: #000;
   }
 
   :focus-visible {
@@ -361,6 +397,11 @@
       transform: none !important;
       filter: none !important;
     }
+
+    /* Drop the decorative scanline overlay for reduced-motion users. */
+    body::before {
+      display: none !important;
+    }
   }
 }
 
@@ -377,7 +418,7 @@
 }
 
 @utility glass-strong {
-  background-color: rgb(10 14 24 / 0.72);
+  background-color: rgb(18 4 4 / 0.72);
   border: 1px solid var(--color-hairline-strong);
   backdrop-filter: blur(26px) saturate(180%);
   -webkit-backdrop-filter: blur(26px) saturate(180%);
@@ -395,9 +436,9 @@
   background-image: linear-gradient(
     100deg,
     #ffffff 0%,
-    #dbeafe 32%,
-    var(--color-electric-400) 68%,
-    var(--color-cyber-cyan) 100%
+    #ffd6d6 30%,
+    var(--color-electric-400) 66%,
+    var(--color-cyber-violet) 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
@@ -456,22 +497,22 @@
   background-image:
     radial-gradient(
       42rem 34rem at 12% 8%,
-      rgb(10 132 255 / 0.16) 0%,
+      rgb(230 0 0 / 0.18) 0%,
       transparent 60%
     ),
     radial-gradient(
       38rem 30rem at 88% 14%,
-      rgb(124 92 255 / 0.13) 0%,
+      rgb(139 0 0 / 0.16) 0%,
       transparent 62%
     ),
     radial-gradient(
       44rem 32rem at 76% 78%,
-      rgb(34 211 238 / 0.1) 0%,
+      rgb(255 45 45 / 0.1) 0%,
       transparent 62%
     ),
     radial-gradient(
       36rem 30rem at 18% 88%,
-      rgb(10 132 255 / 0.1) 0%,
+      rgb(153 0 0 / 0.12) 0%,
       transparent 60%
     );
 }
@@ -531,14 +572,14 @@
 /* Accent glows ----------------------------------------------------------- */
 @utility glow-electric {
   box-shadow:
-    0 0 0 1px rgb(10 132 255 / 0.35),
-    0 8px 30px -8px rgb(10 132 255 / 0.45);
+    0 0 0 1px rgb(230 0 0 / 0.4),
+    0 8px 30px -8px rgb(230 0 0 / 0.5);
 }
 
 @utility glow-electric-lg {
   box-shadow:
-    0 0 0 1px rgb(10 132 255 / 0.4),
-    0 18px 60px -12px rgb(10 132 255 / 0.55);
+    0 0 0 1px rgb(230 0 0 / 0.45),
+    0 18px 60px -12px rgb(230 0 0 / 0.6);
 }
 
 /* ==========================================================================
@@ -715,5 +756,683 @@
 
   pre, blockquote, img {
     break-inside: avoid;
+  }
+}
+
+/* ==========================================================================
+   Professional UI refresh
+
+   The original visual system intentionally leaned into a terminal aesthetic.
+   These final overrides keep the dark-red identity while making Inter the real
+   reading and display face, quieting decorative effects, and giving surfaces a
+   warmer, more professional finish. Monospace remains available for code and
+   genuinely technical metadata through `font-mono`.
+   ========================================================================== */
+:root {
+  --font-sans: "Inter", "Inter Fallback", Arial, sans-serif;
+  --font-display: "Inter", "Inter Fallback", Arial, sans-serif;
+
+  --color-void-950: #070607;
+  --color-void-900: #0d0b0c;
+  --color-void-850: #121012;
+  --color-void-800: #181416;
+  --color-void-700: #241d20;
+  --color-void-600: #34272c;
+  --color-void-500: #48343a;
+
+  --color-electric-50: #fff1f2;
+  --color-electric-100: #ffe0e3;
+  --color-electric-200: #ffb8c0;
+  --color-electric-300: #ff7b88;
+  --color-electric-400: #f94f61;
+  --color-electric-500: #e52d43;
+  --color-electric-600: #c91f36;
+  --color-electric-700: #a3182c;
+  --color-electric-800: #761321;
+  --color-electric-900: #490c15;
+  --color-cyber-cyan: #ff6c79;
+  --color-cyber-violet: #8d2435;
+
+  --color-ink: #faf8f9;
+  --color-ink-muted: #b8b1b5;
+  --color-ink-faint: #91888d;
+  --color-hairline: rgb(255 255 255 / 0.09);
+  --color-hairline-strong: rgb(255 255 255 / 0.16);
+}
+
+body {
+  letter-spacing: -0.006em;
+}
+
+/* Remove the CRT scanline treatment; the restrained mesh carries the theme. */
+body::before {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+}
+
+h1 {
+  letter-spacing: -0.055em;
+}
+
+.glass {
+  background-color: rgb(17 14 16 / 0.72);
+  border-color: rgb(255 255 255 / 0.09);
+  backdrop-filter: blur(16px) saturate(135%);
+  -webkit-backdrop-filter: blur(16px) saturate(135%);
+}
+
+.glass-strong {
+  background-color: rgb(12 10 11 / 0.9);
+  border-color: rgb(255 255 255 / 0.12);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.lit-edge {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 18px 50px -36px rgb(0 0 0 / 0.9);
+}
+
+.text-gradient {
+  background-image: linear-gradient(
+    105deg,
+    #ffffff 0%,
+    #ffe0e3 46%,
+    var(--color-electric-400) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-muted {
+  background-image: linear-gradient(180deg, #ffffff 0%, #b8b1b5 100%);
+}
+
+.bg-mesh {
+  background-color: var(--color-void-950);
+  background-image:
+    radial-gradient(
+      48rem 38rem at 8% 0%,
+      rgb(201 31 54 / 0.16) 0%,
+      transparent 64%
+    ),
+    radial-gradient(
+      42rem 34rem at 96% 20%,
+      rgb(118 19 33 / 0.14) 0%,
+      transparent 66%
+    ),
+    radial-gradient(
+      36rem 30rem at 54% 92%,
+      rgb(229 45 67 / 0.07) 0%,
+      transparent 68%
+    );
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+.glow-electric {
+  box-shadow:
+    0 0 0 1px rgb(229 45 67 / 0.3),
+    0 18px 45px -22px rgb(201 31 54 / 0.55);
+}
+
+.glow-electric-lg {
+  box-shadow:
+    0 0 0 1px rgb(229 45 67 / 0.34),
+    0 28px 75px -30px rgb(201 31 54 / 0.58);
+}
+
+/* Keep the existing clean print contract after the unlayered overrides above. */
+@media print {
+  .glass,
+  .glass-strong,
+  .lit-edge {
+    background: transparent !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ==========================================================================
+   Dark-web HUD layer
+   ========================================================================== */
+:root {
+  --color-void-950: #030203;
+  --color-void-900: #080506;
+  --color-void-850: #0d080a;
+  --color-void-800: #140b0e;
+  --color-void-700: #211116;
+}
+
+.bg-mesh {
+  background-color: var(--color-void-950);
+  background-image:
+    radial-gradient(
+      52rem 40rem at 7% -4%,
+      rgb(201 31 54 / 0.2) 0%,
+      transparent 64%
+    ),
+    radial-gradient(
+      46rem 36rem at 101% 18%,
+      rgb(118 19 33 / 0.18) 0%,
+      transparent 67%
+    ),
+    radial-gradient(
+      40rem 32rem at 54% 96%,
+      rgb(229 45 67 / 0.09) 0%,
+      transparent 70%
+    );
+}
+
+.darkweb-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(255 70 88 / 0.026) 0,
+    rgb(255 70 88 / 0.026) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: screen;
+}
+
+.darkweb-sweep {
+  animation: darkweb-sweep 10s linear infinite;
+}
+
+.darkweb-data-column {
+  text-shadow: 0 0 10px rgb(229 45 67 / 0.42);
+  animation: darkweb-data-drift 18s linear infinite;
+}
+
+.camera-scan {
+  animation: camera-scan 3.8s linear infinite;
+}
+
+@keyframes darkweb-sweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -8vh, 0);
+  }
+  8%,
+  88% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 112vh, 0);
+  }
+}
+
+@keyframes darkweb-data-drift {
+  from {
+    transform: translate3d(0, -18%, 0);
+  }
+  to {
+    transform: translate3d(0, 8%, 0);
+  }
+}
+
+@keyframes camera-scan {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  12%,
+  88% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, min(56.25vw, 38rem), 0);
+  }
+}
+
+@media (max-width: 639px) {
+  .darkweb-data-column {
+    animation: none;
+  }
+
+  .darkweb-data-column:nth-child(even) {
+    display: none;
+  }
+
+  .darkweb-scanlines {
+    opacity: 0.65;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .darkweb-sweep,
+  .darkweb-data-column,
+  .camera-scan {
+    animation: none !important;
+  }
+
+  .darkweb-sweep {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Maximum dark-web interface layer
+   ========================================================================== */
+.cyber-heading {
+  position: relative;
+  text-shadow:
+    0 0 24px rgb(229 45 67 / 0.08),
+    0 1px 0 rgb(255 255 255 / 0.04);
+}
+
+.cyber-heading::after {
+  content: "";
+  display: block;
+  width: min(8rem, 42%);
+  height: 1px;
+  margin-top: 0.32em;
+  background: linear-gradient(
+    90deg,
+    var(--color-electric-400),
+    rgb(229 45 67 / 0.14),
+    transparent
+  );
+  box-shadow: 0 0 12px rgb(229 45 67 / 0.28);
+}
+
+.text-center .cyber-heading::after {
+  margin-right: auto;
+  margin-left: auto;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-electric-400),
+    transparent
+  );
+}
+
+.cyber-glitch {
+  display: inline-block;
+  isolation: isolate;
+}
+
+.cyber-glitch::before,
+.cyber-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.cyber-glitch::before {
+  z-index: -1;
+  color: var(--color-electric-300);
+  -webkit-text-fill-color: var(--color-electric-300);
+  text-shadow: -2px 0 var(--color-electric-500);
+  animation: cyber-glitch-a 8s steps(1, end) infinite;
+}
+
+.cyber-glitch::after {
+  z-index: 1;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  mix-blend-mode: screen;
+  text-shadow: 2px 0 var(--color-electric-700);
+  animation: cyber-glitch-b 8s steps(1, end) 80ms infinite;
+}
+
+.cyber-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border: 1px solid rgb(229 45 67 / 0.08);
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 28px rgb(229 45 67 / 0.018),
+    inset 0 1px 0 rgb(255 255 255 / 0.035);
+  pointer-events: none;
+  transition:
+    border-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.cyber-card::after {
+  content: "";
+  position: absolute;
+  z-index: 21;
+  top: 0;
+  left: 12%;
+  width: 35%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-electric-300),
+    transparent
+  );
+  box-shadow: 0 0 14px rgb(229 45 67 / 0.7);
+  opacity: 0.32;
+  pointer-events: none;
+  transform: translateX(-80%);
+  transition:
+    opacity 300ms ease,
+    transform 600ms var(--ease-out-expo);
+}
+
+.cyber-card:hover::before {
+  border-color: rgb(229 45 67 / 0.24);
+  box-shadow:
+    inset 0 0 36px rgb(229 45 67 / 0.035),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+.cyber-card:hover::after {
+  opacity: 0.85;
+  transform: translateX(185%);
+}
+
+main#main > section + section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(calc(100% - 2rem), 72rem);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(229 45 67 / 0.12) 20%,
+    rgb(249 79 97 / 0.55) 50%,
+    rgb(229 45 67 / 0.12) 80%,
+    transparent
+  );
+  box-shadow: 0 0 18px rgb(201 31 54 / 0.16);
+  transform: translateX(-50%);
+  animation: cyber-divider-pulse 5s ease-in-out infinite;
+}
+
+.terminal-typewriter {
+  display: inline-block;
+  max-width: 100%;
+  width: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--color-electric-300);
+  white-space: nowrap;
+  animation:
+    terminal-type 4.4s steps(40, end) 500ms both,
+    terminal-caret 760ms step-end infinite;
+}
+
+.hero-terminal-feed {
+  position: relative;
+  min-height: 1.25rem;
+  overflow: hidden;
+}
+
+.hero-terminal-line {
+  position: absolute;
+  inset: 0 auto auto 0;
+  opacity: 0;
+  white-space: nowrap;
+  animation: terminal-feed 12s ease-in-out infinite;
+}
+
+.camera-monitor {
+  isolation: isolate;
+}
+
+.camera-monitor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgb(249 79 97 / 0.08),
+    inset 0 0 70px rgb(201 31 54 / 0.07);
+}
+
+.camera-monitor[data-filter="red"] video {
+  filter: grayscale(1) sepia(1) saturate(6) hue-rotate(315deg) contrast(1.18)
+    brightness(0.76);
+}
+
+.camera-monitor[data-filter="mono"] video {
+  filter: grayscale(1) contrast(1.18) brightness(0.82);
+}
+
+.camera-monitor[data-recording="true"] video {
+  animation: camera-feed-glitch 2.7s steps(1, end) infinite;
+}
+
+.camera-target {
+  animation: camera-target-pulse 2.8s ease-in-out infinite;
+}
+
+.camera-hud-flicker {
+  animation: camera-hud-flicker 4.6s steps(1, end) infinite;
+}
+
+.captured-photo[data-filter="red"] img {
+  filter: grayscale(1) sepia(1) saturate(6) hue-rotate(315deg) contrast(1.18)
+    brightness(0.76);
+}
+
+.captured-photo[data-filter="mono"] img {
+  filter: grayscale(1) contrast(1.18) brightness(0.82);
+}
+
+@keyframes cyber-glitch-a {
+  0%,
+  89%,
+  92%,
+  100% {
+    opacity: 0;
+    clip-path: inset(0);
+    transform: translate(0);
+  }
+  90% {
+    opacity: 0.42;
+    clip-path: inset(12% 0 62% 0);
+    transform: translate(-3px, 1px);
+  }
+  91% {
+    opacity: 0.28;
+    clip-path: inset(70% 0 8% 0);
+    transform: translate(2px, -1px);
+  }
+}
+
+@keyframes cyber-glitch-b {
+  0%,
+  90%,
+  93%,
+  100% {
+    opacity: 0;
+    clip-path: inset(0);
+    transform: translate(0);
+  }
+  91% {
+    opacity: 0.3;
+    clip-path: inset(45% 0 34% 0);
+    transform: translate(3px);
+  }
+  92% {
+    opacity: 0.18;
+    clip-path: inset(6% 0 80% 0);
+    transform: translate(-2px, 1px);
+  }
+}
+
+@keyframes cyber-divider-pulse {
+  0%,
+  100% {
+    opacity: 0.34;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes terminal-type {
+  from {
+    width: 0;
+  }
+  to {
+    width: 40ch;
+  }
+}
+
+@keyframes terminal-caret {
+  50% {
+    border-color: transparent;
+  }
+}
+
+@keyframes terminal-feed {
+  0%,
+  4% {
+    opacity: 0;
+    transform: translate3d(0, 5px, 0);
+  }
+  9%,
+  27% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  33%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+@keyframes camera-feed-glitch {
+  0%,
+  91%,
+  94%,
+  100% {
+    clip-path: inset(0);
+  }
+  92% {
+    clip-path: inset(8% 0 64% 0);
+  }
+  93% {
+    clip-path: inset(58% 0 12% 0);
+  }
+}
+
+@keyframes camera-target-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  50% {
+    opacity: 0.78;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@keyframes camera-hud-flicker {
+  0%,
+  96%,
+  100% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0.45;
+  }
+  98% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cyber-glitch::before,
+  .cyber-glitch::after,
+  main#main > section + section::before,
+  .terminal-typewriter,
+  .hero-terminal-line,
+  .camera-monitor[data-recording="true"] video,
+  .camera-target,
+  .camera-hud-flicker {
+    animation: none !important;
+  }
+
+  .cyber-glitch::before,
+  .cyber-glitch::after {
+    display: none;
+  }
+
+  .terminal-typewriter {
+    width: auto;
+    border-right: 0;
+    white-space: normal;
+  }
+
+  .hero-terminal-line:first-child {
+    position: static;
+    opacity: 1;
+    white-space: normal;
+  }
+}
+
+@media print {
+  .cyber-heading,
+  .cyber-glitch {
+    text-shadow: none !important;
+  }
+
+  .cyber-heading::after,
+  .cyber-glitch::before,
+  .cyber-glitch::after,
+  .cyber-card::before,
+  .cyber-card::after,
+  main#main > section + section::before {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Performance: pause decorative loops when the tab is hidden
+
+   The body gets `data-page-hidden` from a tiny visibilitychange handler in the
+   layout. Suspending the continuously-animating decorative layers while the
+   page is not visible stops needless GPU/paint work in background tabs.
+   ========================================================================== */
+body[data-page-hidden="true"] .darkweb-sweep,
+body[data-page-hidden="true"] .darkweb-data-column,
+body[data-page-hidden="true"] .camera-scan,
+body[data-page-hidden="true"] .cyber-glitch::before,
+body[data-page-hidden="true"] .cyber-glitch::after,
+body[data-page-hidden="true"] .hero-terminal-line,
+body[data-page-hidden="true"] [class*="animate-drift"],
+body[data-page-hidden="true"] main#main > section + section::before {
+  animation-play-state: paused !important;
+}
+
+/* The full-screen data-stream layer is decorative texture; drop its cost on
+   coarse-pointer / small devices where it is least visible and most expensive. */
+@media (max-width: 767px) {
+  .darkweb-data-column {
+    display: none;
   }
 }

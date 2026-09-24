@@ -14,11 +14,6 @@ export default function HomePage() {
       <About />
       <Skills />
       <CurrentFocus />
-      {/*
-        Projects reaches out to the GitHub API. The Suspense boundary keeps a
-        slow or rate-limited response from holding up the rest of the page —
-        everything above and below streams immediately.
-      */}
       <Suspense fallback={null}>
         <Projects />
       </Suspense>

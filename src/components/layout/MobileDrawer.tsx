@@ -132,7 +132,7 @@ export function MobileDrawer({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.24, ease: easeOut }}
-          className="fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-void-950/85 backdrop-blur-2xl outline-none md:hidden"
+          className="fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-void-950/85 backdrop-blur-2xl outline-none xl:hidden"
         >
           {/* Clears the fixed header so the first row is never underneath it. */}
           <div className="h-[4.75rem] shrink-0" />
@@ -232,7 +232,7 @@ export function MobileDrawer({
                 ease: easeOut,
                 delay: 0.05 + links.length * 0.045,
               }}
-              className="mt-6 flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-electric-600 to-electric-700 px-5 text-[0.9375rem] font-medium text-white shadow-[0_12px_32px_-14px_rgba(10,132,255,0.9)] active:from-electric-700 active:to-electric-700"
+              className="mt-6 flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-electric-600 to-electric-700 px-5 text-[0.9375rem] font-medium text-white shadow-[0_12px_32px_-14px_rgba(201,31,54,0.9)] active:from-electric-700 active:to-electric-700"
             >
               Get in touch
               <ArrowRightIcon aria-hidden="true" className="size-4" />

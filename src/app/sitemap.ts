@@ -3,13 +3,20 @@ import { siteConfig } from "@/data/site";
 import { isGitHubConfigured } from "@/lib/github";
 import { getNotes } from "@/lib/notes";
 
-/**
- * Sitemap.
- *
- * The notes index is only listed once something is published — advertising an
- * empty page to crawlers is worse than not listing it. Drafts are excluded,
- * since `getNotes()` filters them out by default.
- */
+const toolSlugs = [
+  "camera",
+  "json",
+  "jwt",
+  "base64",
+  "uuid",
+  "hash",
+  "regex",
+  "timestamp",
+  "url",
+  "markdown",
+] as const;
+
+/** Build the public sitemap from configured and published content. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const notes = getNotes();
 
@@ -31,14 +38,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // Developer Tools
-  const toolSlugs = ["json", "jwt", "base64", "uuid", "hash", "regex", "timestamp", "url", "markdown"];
+  entries.push({
+    url: `${siteConfig.url}/arcade`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  });
+
+  entries.push({
+    url: `${siteConfig.url}/challenge`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  });
+
   entries.push({
     url: `${siteConfig.url}/tools`,
     lastModified: new Date(),
     changeFrequency: "monthly",
     priority: 0.8,
   });
+
   for (const slug of toolSlugs) {
     entries.push({
       url: `${siteConfig.url}/tools/${slug}`,

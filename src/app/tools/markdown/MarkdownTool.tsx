@@ -12,13 +12,37 @@ import { ToolLayout } from "@/components/tools/ToolLayout";
  *
  * No external dependencies — keeps the tool bundle tiny.
  */
-function markdownToHtml(md: string): string {
-  let html = md;
+/** Escapes every HTML-significant character so raw markup cannot be injected. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
-  // Code blocks (``` ... ```)
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
-    const escaped = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    return `<pre><code class="language-${lang || "text"}">${escaped}</code></pre>`;
+/**
+ * Only http(s), mailto and relative links are allowed. Anything else —
+ * javascript:, data:, vbscript: and similar — is neutralised to "#" so a
+ * crafted link cannot execute script when clicked.
+ */
+function safeUrl(raw: string): string {
+  const url = raw.trim();
+  if (/^(https?:|mailto:)/i.test(url)) return url;
+  if (/^(\/|\.\/|\.\.\/|#)/.test(url)) return url;
+  return "#";
+}
+
+function markdownToHtml(md: string): string {
+  // Escape the entire input first. Every tag emitted below is produced by this
+  // function from trusted templates, so user text can never inject markup.
+  let html = escapeHtml(md);
+
+  // Code blocks (``` ... ```) — content is already escaped above.
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang: string, code: string) => {
+    const safeLang = /^[a-z0-9]+$/i.test(lang) ? lang : "text";
+    return `<pre><code class="language-${safeLang}">${code}</code></pre>`;
   });
 
   // Inline code
@@ -40,8 +64,12 @@ function markdownToHtml(md: string): string {
   html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
-  // Links
-  html = html.replace(/\[([^\]]+)]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // Links — the URL is validated against an allowlist of safe schemes.
+  html = html.replace(
+    /\[([^\]]+)]\(([^)]+)\)/g,
+    (_, text: string, url: string) =>
+      `<a href="${escapeHtml(safeUrl(url))}" rel="nofollow noopener noreferrer">${text}</a>`,
+  );
 
   // Blockquotes
   html = html.replace(/^>\s+(.+)$/gm, "<blockquote>$1</blockquote>");

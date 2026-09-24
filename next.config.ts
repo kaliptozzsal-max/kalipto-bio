@@ -10,14 +10,56 @@ import type { NextConfig } from "next";
  * See node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md
  * if you want to add one.
  */
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * Content-Security-Policy.
+ *
+ * This site is statically rendered and CDN-cacheable, so a per-request nonce
+ * (which forces dynamic rendering) is deliberately avoided. Scripts are locked
+ * to same-origin; there are no third-party or inline scripts in production.
+ *
+ * `style-src` allows `'unsafe-inline'` because Tailwind v4 and Next inject a
+ * small inline <style>. Inline styles cannot execute code, so this is a minor,
+ * accepted relaxation while `script-src` stays strict — that is what actually
+ * blocks XSS. In development React uses eval, so `'unsafe-eval'` is added only
+ * there and never ships to production.
+ */
+const cspDirectives = [
+  "default-src 'self'",
+  `script-src 'self'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' blob: data: https://avatars.githubusercontent.com",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "media-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "frame-src 'none'",
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "upgrade-insecure-requests",
+];
+
+const contentSecurityPolicy = cspDirectives.join("; ");
+
 const securityHeaders = [
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+    // Same-origin code may request camera access, but browsers still require
+    // an explicit user permission grant. Microphone and other sensors stay off.
+    value:
+      "camera=(self), microphone=(), geolocation=(), browsing-topics=(), payment=(), usb=(), bluetooth=(), serial=()",
   },
   {
     key: "Strict-Transport-Security",
@@ -25,9 +67,22 @@ const securityHeaders = [
   },
 ];
 
+const challengeSecurityHeaders = securityHeaders.map((header) =>
+  header.key === "Permissions-Policy"
+    ? {
+        ...header,
+        // The CTF needs no device sensors at all.
+        value:
+          "camera=(), microphone=(), geolocation=(), browsing-topics=(), payment=(), usb=(), bluetooth=(), serial=()",
+      }
+    : header,
+);
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Private Wi-Fi origin used for phone testing of dev-only assets/HMR.
+  allowedDevOrigins: ["192.168.1.222"],
 
   /*
    * Lets `.mdx` files be treated as modules and pages. Notes live in
@@ -65,6 +120,12 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        // The CTF needs no sensors. This later, more-specific rule overrides
+        // the global same-origin camera allowance used by Camera Lab.
+        source: "/challenge/:path*",
+        headers: challengeSecurityHeaders,
       },
     ];
   },

@@ -52,6 +52,28 @@ const REVALIDATE_SECONDS = 60 * 60; // 1 hour
 const MAX_REPOS = 6;
 
 /**
+ * Hard ceiling on how long a GitHub request may take. Without this, a slow or
+ * blocked network (common on mobile or restricted Wi-Fi) leaves the fetch
+ * hanging, and any section awaiting it appears stuck loading forever. On
+ * timeout the request aborts and the section simply hides.
+ */
+const GITHUB_TIMEOUT_MS = 6000;
+
+/** fetch() with an abort-based timeout. Rejects on timeout so callers can catch. */
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit & { next?: { revalidate: number } },
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GITHUB_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * Brand colours for the languages this site is likely to show. Anything not
  * listed falls back to the accent colour, so an unknown language degrades
  * quietly instead of rendering an empty dot.
@@ -79,8 +101,8 @@ const LANGUAGE_COLORS: Record<string, string> = {
 };
 
 export function languageColor(language: string | null): string {
-  if (!language) return "#0a84ff";
-  return LANGUAGE_COLORS[language] ?? "#0a84ff";
+  if (!language) return "#e60000";
+  return LANGUAGE_COLORS[language] ?? "#e60000";
 }
 
 /** True when a GitHub handle has been configured. */
@@ -106,7 +128,7 @@ export async function fetchRepos(): Promise<Repo[]> {
   const headers = githubHeaders();
 
   try {
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&sort=pushed&type=owner`,
       {
         headers,
@@ -318,7 +340,7 @@ export async function fetchAllRepos(): Promise<FullRepo[]> {
 
     // GitHub caps at 100 per page; iterate until we get fewer than perPage.
     while (page <= 10) {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=${perPage}&page=${page}&sort=pushed&type=owner`,
         {
           headers,

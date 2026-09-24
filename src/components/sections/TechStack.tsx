@@ -17,10 +17,10 @@ export function TechStack() {
           id="stack-title"
           title={
             <>
-              The tools I reach for <span className="text-gradient">daily</span>
+              Tools chosen for <span className="text-gradient">real work</span>
             </>
           }
-          subtitle="A small, well-understood stack I keep returning to as I build."
+          subtitle="A focused, dependable stack for building secure and useful products."
         />
 
         <RevealGroup
@@ -32,17 +32,17 @@ export function TechStack() {
             <RevealItem key={tech.name} as="li" variant="scaleIn">
               <div
                 style={{ "--brand": tech.color } as CSSProperties}
-                className="group relative flex aspect-square flex-col items-center justify-center gap-3 overflow-hidden rounded-3xl glass lit-edge transition-[border-color,transform] duration-500 ease-out hover:-translate-y-1.5 hover:border-hairline-strong"
+                className="group relative flex aspect-square flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border border-hairline bg-void-900/65 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-lg transition-[border-color,transform,background-color] duration-300 ease-out hover:-translate-y-1 hover:border-hairline-strong hover:bg-void-850/80"
               >
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 -bottom-14 h-28 bg-[var(--brand)] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+                  className="pointer-events-none absolute inset-x-4 -bottom-12 h-24 bg-[var(--brand)] opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-20"
                 />
                 <tech.Icon
                   aria-hidden="true"
-                  className="size-7 text-ink-muted transition-[color,transform] duration-500 ease-out group-hover:scale-110 group-hover:text-[var(--brand)] sm:size-8"
+                  className="size-7 text-ink-muted transition-[color,transform] duration-300 ease-out group-hover:scale-105 group-hover:text-[var(--brand)] sm:size-8"
                 />
-                <span className="px-1 text-center font-mono text-xs leading-tight tracking-[0.04em] text-ink-faint uppercase transition-colors duration-500 group-hover:text-ink min-[400px]:tracking-[0.08em] sm:px-1.5 lg:text-[0.6875rem]">
+                <span className="px-1 text-center text-xs leading-tight font-medium text-ink-faint transition-colors duration-300 group-hover:text-ink sm:px-1.5">
                   {tech.name}
                 </span>
               </div>

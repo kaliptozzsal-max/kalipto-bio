@@ -1,0 +1,396 @@
+.gameBoard {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(229 45 67 / 0.2);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(rgb(8 5 6 / 0.9), rgb(4 3 4 / 0.94)),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 31px,
+      rgb(229 45 67 / 0.035) 32px
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.055),
+    inset 0 0 80px rgb(201 31 54 / 0.025),
+    0 34px 90px -48px rgb(201 31 54 / 0.65);
+}
+
+.gameBoard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.012) 0,
+    rgb(255 255 255 / 0.012) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+.terminalScreen {
+  position: relative;
+  min-height: 24rem;
+  overflow: hidden;
+  border: 1px solid rgb(229 45 67 / 0.2);
+  border-radius: 1rem;
+  background: rgb(2 2 2 / 0.9);
+  box-shadow:
+    inset 0 0 60px rgb(201 31 54 / 0.06),
+    0 0 40px -28px rgb(229 45 67 / 0.7);
+}
+
+.terminalScreen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(249 79 97 / 0.025) 0,
+    rgb(249 79 97 / 0.025) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+.terminalCursor {
+  animation: terminal-cursor 800ms step-end infinite;
+}
+
+.packetCard {
+  animation: packet-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.missionComplete {
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 1.25rem;
+  border: 1px solid rgb(229 45 67 / 0.2);
+  border-radius: 1rem;
+  background: radial-gradient(
+    circle at 50% 18%,
+    rgb(201 31 54 / 0.15),
+    rgb(0 0 0 / 0.22) 55%
+  );
+  text-align: center;
+}
+
+.missionComplete::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(229 45 67 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(229 45 67 / 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at 50% 35%, #000, transparent 76%);
+}
+
+.choiceCorrect {
+  border-color: rgb(52 211 153 / 0.55) !important;
+  background: rgb(16 185 129 / 0.1) !important;
+  color: rgb(167 243 208) !important;
+}
+
+.choiceWrong {
+  border-color: rgb(249 79 97 / 0.55) !important;
+  background: rgb(229 45 67 / 0.1) !important;
+  color: rgb(255 184 192) !important;
+}
+
+.vaultMeter {
+  position: relative;
+  overflow: hidden;
+}
+
+.vaultMeter::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 22%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.38), transparent);
+  animation: meter-scan 2.4s ease-in-out infinite;
+}
+
+@keyframes terminal-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes packet-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(18px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes meter-scan {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(520%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminalCursor,
+  .packetCard,
+  .vaultMeter::after {
+    animation: none;
+  }
+}
+
+.cyberFont {
+  font-family: "Oxanium Variable", "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-variation-settings: "wght" 600;
+  letter-spacing: 0.015em;
+}
+
+.avatarHood {
+  position: absolute;
+  z-index: -2;
+  inset: -4% -8% -10%;
+  clip-path: polygon(
+    50% 0,
+    72% 8%,
+    89% 28%,
+    100% 64%,
+    86% 100%,
+    14% 100%,
+    0 64%,
+    11% 28%,
+    28% 8%
+  );
+  border: 1px solid rgb(229 45 67 / 0.28);
+  background:
+    linear-gradient(150deg, rgb(229 45 67 / 0.2), transparent 32%),
+    linear-gradient(180deg, #241015, #080506 66%);
+  filter: drop-shadow(0 20px 24px rgb(0 0 0 / 0.62));
+}
+
+.avatarHood::after {
+  content: "";
+  position: absolute;
+  inset: 8% 10% 5%;
+  clip-path: inherit;
+  background: linear-gradient(180deg, rgb(3 2 3 / 0.2), rgb(3 2 3 / 0.82));
+}
+
+.avatarGlow {
+  position: absolute;
+  z-index: -3;
+  inset: 18%;
+  border-radius: 999px;
+  background: rgb(229 45 67 / 0.34);
+  filter: blur(36px);
+  animation: avatar-glow 3.6s ease-in-out infinite;
+}
+
+.avatarLens {
+  position: absolute;
+  z-index: 1;
+  inset: 15%;
+  overflow: hidden;
+  border: 2px solid rgb(249 79 97 / 0.48);
+  border-radius: 999px;
+  background: #050304;
+  box-shadow:
+    0 0 0 6px rgb(3 2 3 / 0.78),
+    0 0 0 7px rgb(229 45 67 / 0.2),
+    inset 0 0 30px rgb(0 0 0 / 0.72),
+    0 0 32px rgb(201 31 54 / 0.38);
+}
+
+.avatarVignette,
+.avatarScan,
+.avatarGlitch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.avatarVignette {
+  background:
+    radial-gradient(circle at 50% 48%, transparent 36%, rgb(3 2 3 / 0.58) 100%),
+    repeating-linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.035) 0,
+      rgb(255 255 255 / 0.035) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+}
+
+.avatarScan {
+  height: 2px;
+  top: 14%;
+  right: 4%;
+  left: 4%;
+  background: linear-gradient(90deg, transparent, #ff7b88, transparent);
+  box-shadow: 0 0 14px rgb(249 79 97 / 0.95);
+  animation: avatar-scan 3.2s linear infinite;
+}
+
+.avatarGlitch {
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0 18%,
+    rgb(255 123 136 / 0.22) 18% 27%,
+    transparent 27% 65%,
+    rgb(229 45 67 / 0.2) 65% 78%,
+    transparent 78%
+  );
+  mix-blend-mode: screen;
+  animation: avatar-glitch 6s steps(1, end) infinite;
+}
+
+.avatarRing {
+  position: absolute;
+  z-index: 4;
+  inset: 3%;
+  width: 94%;
+  height: 94%;
+  overflow: visible;
+  filter: drop-shadow(0 0 6px rgb(229 45 67 / 0.46));
+  animation: avatar-ring 18s linear infinite;
+}
+
+@keyframes avatar-glow {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.82;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes avatar-scan {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -1.2rem, 0);
+  }
+  10%,
+  90% {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 7.8rem, 0);
+  }
+}
+
+@keyframes avatar-glitch {
+  0%,
+  91%,
+  94%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  92% {
+    opacity: 0.72;
+    clip-path: inset(18% 0 58% 0);
+    transform: translateX(5px);
+  }
+  93% {
+    opacity: 0.48;
+    clip-path: inset(62% 0 12% 0);
+    transform: translateX(-4px);
+  }
+}
+
+@keyframes avatar-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatarGlow,
+  .avatarScan,
+  .avatarGlitch,
+  .avatarRing {
+    animation: none;
+  }
+}
+
+.cyberUi :is(h1, h2, h3, button) {
+  font-family: "Oxanium Variable", "Inter", sans-serif;
+  font-optical-sizing: auto;
+}
+
+.cyberUi :is(h1, h2, h3) {
+  font-variation-settings: "wght" 650;
+  letter-spacing: -0.01em;
+}
+
+.cyberUi button {
+  font-variation-settings: "wght" 600;
+  letter-spacing: 0.015em;
+}
+
+.operatorIdentity {
+  position: relative;
+  overflow: hidden;
+}
+
+.operatorIdentity::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgb(249 79 97 / 0.7),
+    rgb(229 45 67 / 0.1) 45%,
+    transparent
+  );
+  box-shadow: 0 0 14px rgb(229 45 67 / 0.36);
+}
+
+.operatorName {
+  font-family: "Oxanium Variable", "Inter", sans-serif;
+  font-variation-settings: "wght" 760;
+  letter-spacing: 0.06em;
+  text-shadow:
+    0 0 22px rgb(229 45 67 / 0.22),
+    0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+/* Phone readability for the arcade dashboard and game boards. */
+@media (max-width: 639px) {
+  .cyberUi :is(h1, h2, h3) {
+    letter-spacing: -0.005em;
+  }
+
+  .cyberUi .text-\[0\.625rem\] {
+    font-size: 0.75rem;
+  }
+
+  .gameBoard,
+  .terminalScreen {
+    border-radius: 1rem;
+  }
+
+  .operatorName {
+    letter-spacing: 0.03em;
+  }
+}

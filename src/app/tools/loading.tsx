@@ -15,7 +15,7 @@ export default function ToolsLoading() {
           <div className="h-5 w-96 max-w-full animate-pulse rounded-lg bg-white/[0.04]" />
         </div>
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 9 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
               className="h-44 animate-pulse rounded-[1.25rem] border border-hairline bg-white/[0.02] sm:rounded-3xl"

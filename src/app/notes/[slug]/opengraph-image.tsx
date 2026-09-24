@@ -54,7 +54,7 @@ export default async function NoteOpenGraphImage({
           justifyContent: "space-between",
           padding: 72,
           background:
-            "linear-gradient(135deg, #04060b 0%, #070d1a 45%, #04101f 100%)",
+            "linear-gradient(135deg, #010101 0%, #0c0404 45%, #170808 100%)",
           position: "relative",
         }}
       >
@@ -66,7 +66,7 @@ export default async function NoteOpenGraphImage({
             width: 760,
             height: 620,
             borderRadius: 9999,
-            background: "rgba(10,132,255,0.28)",
+            background: "rgba(230,0,0,0.30)",
             filter: "blur(140px)",
           }}
         />
@@ -81,9 +81,9 @@ export default async function NoteOpenGraphImage({
               width: 52,
               height: 52,
               borderRadius: 16,
-              border: "2px solid rgba(61,148,255,0.5)",
-              background: "rgba(10,132,255,0.16)",
-              color: "#a8d0ff",
+              border: "2px solid rgba(255,45,45,0.5)",
+              background: "rgba(230,0,0,0.16)",
+              color: "#ff6b6b",
               fontSize: 28,
               fontWeight: 700,
             }}

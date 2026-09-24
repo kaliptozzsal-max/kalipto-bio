@@ -28,7 +28,7 @@ export default function OpenGraphImage() {
           justifyContent: "space-between",
           padding: 72,
           background:
-            "linear-gradient(135deg, #04060b 0%, #070d1a 45%, #04101f 100%)",
+            "linear-gradient(135deg, #010101 0%, #0c0404 45%, #170808 100%)",
           position: "relative",
         }}
       >
@@ -41,7 +41,7 @@ export default function OpenGraphImage() {
             width: 760,
             height: 620,
             borderRadius: 9999,
-            background: "rgba(10,132,255,0.30)",
+            background: "rgba(230,0,0,0.32)",
             filter: "blur(140px)",
           }}
         />
@@ -53,7 +53,7 @@ export default function OpenGraphImage() {
             width: 560,
             height: 520,
             borderRadius: 9999,
-            background: "rgba(34,211,238,0.16)",
+            background: "rgba(139,0,0,0.20)",
             filter: "blur(140px)",
           }}
         />
@@ -68,9 +68,9 @@ export default function OpenGraphImage() {
               width: 56,
               height: 56,
               borderRadius: 18,
-              border: "2px solid rgba(61,148,255,0.5)",
-              background: "rgba(10,132,255,0.16)",
-              color: "#a8d0ff",
+              border: "2px solid rgba(255,45,45,0.5)",
+              background: "rgba(230,0,0,0.16)",
+              color: "#ff6b6b",
               fontSize: 30,
               fontWeight: 700,
             }}
@@ -131,7 +131,7 @@ export default function OpenGraphImage() {
                 border: "1px solid rgba(255,255,255,0.14)",
                 background: "rgba(255,255,255,0.04)",
                 fontSize: 22,
-                color: "#d2e7ff",
+                color: "#ffd6d6",
               }}
             >
               {role}

@@ -4,6 +4,7 @@ import { SiteBackground } from "@/components/background/SiteBackground";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { VisibilityFlag } from "@/components/util/VisibilityFlag";
 import { profileUrls, siteConfig } from "@/data/site";
 import { getNavLinks } from "@/lib/navigation";
 import "./globals.css";
@@ -65,7 +66,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#04060b",
+  themeColor: "#070607",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -151,6 +152,7 @@ export default function RootLayout({
           Skip to main content
         </a>
 
+        <VisibilityFlag />
         <MotionProvider>
           <SiteBackground />
           {/* Navigation is derived on the server — see lib/navigation.ts */}

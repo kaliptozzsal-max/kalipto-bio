@@ -159,7 +159,7 @@ export function Navbar({ links }: { links: readonly NavLink[] }) {
               <span>{siteConfig.name}</span>
             </a>
 
-            <ul className="hidden items-center gap-1 md:flex">
+            <ul className="hidden items-center gap-1 xl:flex">
               {links.map((link) => {
                 const isActive =
                   link.kind === "anchor"
@@ -218,7 +218,7 @@ export function Navbar({ links }: { links: readonly NavLink[] }) {
             <div className="flex items-center gap-2">
               <a
                 href={isHome ? "#contact" : "/#contact"}
-                className="hidden h-11 items-center rounded-full bg-gradient-to-br from-electric-600 to-electric-700 px-4 text-[0.8125rem] font-medium text-white shadow-[0_8px_24px_-12px_rgba(10,132,255,0.9)] transition-shadow duration-300 hover:shadow-[0_14px_34px_-10px_rgba(10,132,255,1)] sm:inline-flex lg:h-9"
+                className="hidden h-11 items-center rounded-full bg-gradient-to-br from-electric-600 to-electric-700 px-4 text-[0.8125rem] font-medium text-white shadow-[0_8px_24px_-12px_rgba(201,31,54,0.9)] transition-shadow duration-300 hover:shadow-[0_14px_34px_-10px_rgba(201,31,54,1)] sm:inline-flex lg:h-9"
               >
                 Get in touch
               </a>

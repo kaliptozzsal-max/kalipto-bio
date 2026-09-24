@@ -36,7 +36,7 @@ export function MenuToggle({
       aria-expanded={open}
       aria-controls={controls}
       aria-label={open ? "Close menu" : "Open menu"}
-      className="relative grid size-11 shrink-0 place-items-center rounded-full border border-hairline bg-white/[0.04] text-ink transition-colors duration-300 active:bg-white/[0.09] md:hidden"
+      className="relative grid size-11 shrink-0 place-items-center rounded-full border border-hairline bg-white/[0.04] text-ink transition-colors duration-300 active:bg-white/[0.09] xl:hidden"
     >
       <span aria-hidden="true" className="relative block h-[10px] w-[18px]">
         <m.span

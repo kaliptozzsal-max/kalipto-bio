@@ -7,20 +7,11 @@ type GlassCardProps = {
   as?: "div" | "article" | "li" | "section";
   /** Hover lift and accent ring. Turn off for static panels. */
   interactive?: boolean;
-  /** Gradient wash behind the content, e.g. "from-electric-500/20 ...". */
+  /** Optional brand wash behind the content. */
   accent?: string;
 };
 
-/**
- * The core surface: frosted glass, 24px corners, hairline border and a lit top
- * edge, lifting slightly on hover.
- *
- * The hover lift is a CSS transition rather than a Framer `whileHover`. There
- * are around thirty of these on the page, and each Framer element carries a
- * runtime instance plus its own gesture listeners; a composited CSS transform is
- * visually identical here and keeps the card a Server Component, so none of its
- * markup ships as client JavaScript.
- */
+/** A quiet elevated surface shared by the homepage sections. */
 export function GlassCard({
   children,
   className,
@@ -31,13 +22,9 @@ export function GlassCard({
   return (
     <Tag
       className={cn(
-        // 20px radius on mobile, back to the original 24px from `sm`. A large
-        // radius reads as heavier when the card is full-bleed and narrow.
-        "group relative isolate overflow-hidden rounded-[1.25rem] glass lit-edge sm:rounded-3xl",
+        "cyber-card group relative isolate overflow-hidden rounded-2xl glass lit-edge",
         interactive &&
-          // The lift and glow are gated to `lg` and a real hover-capable
-          // pointer. On touch these only ever fire as a stuck state after a tap.
-          "transition-[transform,border-color,box-shadow] duration-400 ease-out lg:will-change-transform lg:hover:-translate-y-1.5 lg:hover:border-electric-500/35 lg:hover:shadow-[0_28px_70px_-34px_rgba(10,132,255,0.5)]",
+          "transition-[transform,border-color,box-shadow] duration-300 ease-out lg:will-change-transform lg:hover:-translate-y-1 lg:hover:border-electric-500/30 lg:hover:shadow-[0_24px_60px_-36px_rgba(201,31,54,0.48)]",
         className,
       )}
     >
@@ -45,7 +32,7 @@ export function GlassCard({
         <span
           aria-hidden="true"
           className={cn(
-            "pointer-events-none absolute -top-24 left-1/2 -z-10 h-56 w-[130%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b opacity-70 blur-2xl transition-opacity duration-500 group-hover:opacity-100",
+            "pointer-events-none absolute -top-28 left-1/2 -z-10 h-56 w-[120%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b opacity-35 blur-3xl transition-opacity duration-500 group-hover:opacity-55",
             accent,
           )}
         />
