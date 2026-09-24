@@ -323,6 +323,23 @@ export function ChallengeArena() {
             <p className="relative mx-auto mt-3 max-w-xl text-sm leading-relaxed text-ink-muted">
               You cleared all {challengeLevels.length} levels for {totalPoints} points. No real access was granted and no system was modified.
             </p>
+
+            <div className="relative mx-auto mt-6 max-w-md rounded-xl border border-electric-500/40 bg-black/50 p-4 text-left">
+              <p className="font-mono text-[0.625rem] tracking-[0.16em] text-electric-300 uppercase">
+                Master flag · a door has appeared
+              </p>
+              <p className="mt-2 font-mono text-sm break-all text-electric-100">
+                KALIPTO&#123;TH3_V01D_S33S_Y0U&#125;
+              </p>
+              <p className="mt-3 text-xs leading-relaxed text-ink-muted">
+                Take it to{" "}
+                <code className="rounded bg-white/[0.06] px-1.5 py-0.5 text-electric-200">
+                  /void
+                </code>{" "}
+                — a layer that does not appear in any menu. What waits there is a
+                direct line to the operator.
+              </p>
+            </div>
           </section>
         ) : null}
 

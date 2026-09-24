@@ -1,0 +1,270 @@
+.shell {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(circle at 50% 40%, rgb(30 0 0 / 0.55), transparent 60%),
+    #000;
+  color: #d8d2d4;
+  font-family: "Oxanium Variable", ui-monospace, monospace;
+}
+
+.checking {
+  font-size: 2rem;
+  letter-spacing: 0.5em;
+  color: #5a1620;
+  animation: void-pulse 1.4s ease-in-out infinite;
+}
+
+/* ---- locked state ---- */
+.lockCard {
+  position: relative;
+  z-index: 2;
+  width: min(30rem, 100%);
+  padding: 2.5rem 1.75rem;
+  text-align: center;
+  border: 1px solid rgb(180 20 40 / 0.25);
+  border-radius: 1rem;
+  background: rgb(8 2 3 / 0.85);
+  box-shadow:
+    inset 0 0 60px rgb(120 0 20 / 0.14),
+    0 30px 90px -50px rgb(180 20 40 / 0.6);
+  backdrop-filter: blur(6px);
+}
+
+.glyph {
+  font-size: 3rem;
+  line-height: 1;
+  color: #b4142c;
+  text-shadow: 0 0 24px rgb(180 20 44 / 0.8);
+  animation: void-flicker 5s steps(1, end) infinite;
+}
+
+.lockTitle {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: #f0e8ea;
+}
+
+.lockText {
+  margin-top: 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: #8f7d81;
+}
+
+.lockForm {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.lockInput {
+  height: 3rem;
+  border: 1px solid rgb(180 20 40 / 0.3);
+  border-radius: 0.6rem;
+  background: rgb(0 0 0 / 0.6);
+  padding: 0 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #f0e8ea;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.lockInput:focus {
+  border-color: rgb(200 30 52 / 0.7);
+}
+
+.lockButton {
+  height: 3rem;
+  border: 1px solid rgb(200 30 52 / 0.5);
+  border-radius: 0.6rem;
+  background: linear-gradient(180deg, #8a0f1f, #4c0812);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.lockButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px -14px rgb(200 30 52 / 0.9);
+}
+
+.lockButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lockError {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  color: #ff5468;
+}
+
+/* ---- open state ---- */
+.voidOpen {
+  background:
+    radial-gradient(circle at 50% 30%, rgb(50 0 6 / 0.7), transparent 55%),
+    #030001;
+}
+
+.scanline {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(255 40 60 / 0.03) 0,
+    rgb(255 40 60 / 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+}
+
+.terminal {
+  position: relative;
+  z-index: 2;
+  width: min(42rem, 100%);
+}
+
+.boot {
+  font-size: 0.8125rem;
+  line-height: 1.9;
+  color: #7bd88f;
+  text-shadow: 0 0 8px rgb(90 220 130 / 0.4);
+}
+
+.bootLine {
+  animation: void-in 0.3s ease-out both;
+}
+
+.reveal {
+  margin-top: 2rem;
+  animation: void-in 0.6s ease-out both;
+}
+
+.voidTitle {
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-shadow:
+    0 0 18px rgb(200 30 52 / 0.6),
+    2px 0 rgb(200 30 52 / 0.5),
+    -2px 0 rgb(40 80 200 / 0.35);
+  animation: void-glitch 4s steps(1, end) infinite;
+}
+
+.voidText {
+  margin-top: 1rem;
+  max-width: 34rem;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: #b3a7ab;
+}
+
+.channels {
+  margin-top: 2rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.channel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.25rem;
+  padding: 0 1.1rem;
+  border: 1px solid rgb(180 20 40 / 0.25);
+  border-radius: 0.7rem;
+  background: rgb(10 2 4 / 0.7);
+  color: #e6dee0;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.15s, background-color 0.2s;
+}
+
+.channel:hover {
+  border-color: rgb(200 30 52 / 0.6);
+  background: rgb(20 4 8 / 0.8);
+  transform: translateX(3px);
+}
+
+.channelLabel {
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.channelHandle {
+  font-size: 0.8125rem;
+  color: #8f7d81;
+}
+
+.sealButton {
+  margin-top: 2rem;
+  border: none;
+  background: none;
+  color: #6a5458;
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.sealButton:hover {
+  color: #ff5468;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes void-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes void-flicker {
+  0%, 92%, 96%, 100% { opacity: 1; }
+  94% { opacity: 0.3; }
+}
+
+@keyframes void-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes void-glitch {
+  0%, 90%, 100% { transform: translate(0); }
+  92% { transform: translate(-2px, 1px); }
+  94% { transform: translate(2px, -1px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checking,
+  .glyph,
+  .bootLine,
+  .reveal,
+  .voidTitle {
+    animation: none;
+  }
+}
