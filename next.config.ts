@@ -16,18 +16,25 @@ const isDev = process.env.NODE_ENV === "development";
  * Content-Security-Policy.
  *
  * This site is statically rendered and CDN-cacheable, so a per-request nonce
- * (which forces dynamic rendering) is deliberately avoided. Scripts are locked
- * to same-origin; there are no third-party or inline scripts in production.
+ * (which forces dynamic rendering and disables caching) is deliberately avoided.
  *
- * `style-src` allows `'unsafe-inline'` because Tailwind v4 and Next inject a
- * small inline <style>. Inline styles cannot execute code, so this is a minor,
- * accepted relaxation while `script-src` stays strict — that is what actually
- * blocks XSS. In development React uses eval, so `'unsafe-eval'` is added only
- * there and never ships to production.
+ * Next.js emits several inline bootstrap/hydration <script> tags in the HTML it
+ * generates. Without a nonce, those inline scripts can only run if `script-src`
+ * allows `'unsafe-inline'`; a strict `script-src 'self'` blocks them and the
+ * page never hydrates (it stays stuck on the loading state). Since a static
+ * export cannot carry a nonce, `'unsafe-inline'` is the correct, functional
+ * choice here. `default-src 'self'` still blocks all external script origins,
+ * `object-src 'none'` blocks plugins, `base-uri`/`form-action` are locked down,
+ * and `frame-ancestors 'none'` prevents clickjacking — so the policy remains a
+ * meaningful defense-in-depth layer. In development React also needs
+ * `'unsafe-eval'`, which never ships to production.
+ *
+ * `style-src` allows `'unsafe-inline'` for Tailwind's injected <style>; inline
+ * styles cannot execute code.
  */
 const cspDirectives = [
   "default-src 'self'",
-  `script-src 'self'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data: https://avatars.githubusercontent.com",
   "font-src 'self'",
